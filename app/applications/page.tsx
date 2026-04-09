@@ -1,0 +1,172 @@
+'use client';
+
+import { useState } from 'react';
+import { Navbar } from '@/components/navbar';
+import { Footer } from '@/components/footer';
+import { Search, Filter, CheckCircle2, XCircle, Clock } from 'lucide-react';
+
+export default function Applications() {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
+
+  const applications = [
+    { id: 1, company: 'Google', position: 'Senior Software Engineer', platform: '💼 LinkedIn', status: 'accepted', date: '2024-01-15' },
+    { id: 2, company: 'Microsoft', position: 'Product Manager', platform: '🔍 Indeed', status: 'pending', date: '2024-01-14' },
+    { id: 3, company: 'Amazon', position: 'Data Scientist', platform: '💬 Glassdoor', status: 'rejected', date: '2024-01-13' },
+    { id: 4, company: 'Meta', position: 'Full Stack Engineer', platform: '📝 ZipRecruiter', status: 'accepted', date: '2024-01-12' },
+    { id: 5, company: 'Apple', position: 'DevOps Engineer', platform: '👹 Monster', status: 'pending', date: '2024-01-11' },
+    { id: 6, company: 'Netflix', position: 'Backend Engineer', platform: '🎲 Dice', status: 'accepted', date: '2024-01-10' },
+    { id: 7, company: 'Tesla', position: 'ML Engineer', platform: '💼 LinkedIn', status: 'rejected', date: '2024-01-09' },
+    { id: 8, company: 'Stripe', position: 'Software Engineer', platform: '🔍 Indeed', status: 'pending', date: '2024-01-08' },
+  ];
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'accepted':
+        return <CheckCircle2 className="w-5 h-5 text-green-400" />;
+      case 'rejected':
+        return <XCircle className="w-5 h-5 text-red-400" />;
+      case 'pending':
+        return <Clock className="w-5 h-5 text-yellow-400" />;
+      default:
+        return null;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'accepted':
+        return 'bg-green-500/10 text-green-300 border-green-500/30';
+      case 'rejected':
+        return 'bg-red-500/10 text-red-300 border-red-500/30';
+      case 'pending':
+        return 'bg-yellow-500/10 text-yellow-300 border-yellow-500/30';
+      default:
+        return 'bg-gray-500/10 text-gray-300 border-gray-500/30';
+    }
+  };
+
+  const filteredApplications = applications.filter((app) => {
+    const matchesSearch =
+      app.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.position.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = filterStatus === 'all' || app.status === filterStatus;
+    return matchesSearch && matchesFilter;
+  });
+
+  return (
+    <main className="min-h-screen bg-background">
+      <Navbar />
+
+      <section className="pt-32 pb-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          {/* Header */}
+          <div className="mb-12">
+            <h1 className="text-5xl md:text-6xl font-bold mb-4 text-white">
+              <span className="gradient-text">My Applications</span>
+            </h1>
+            <p className="text-xl text-gray-300">
+              View and manage all your job applications in one place
+            </p>
+          </div>
+
+          {/* Search and Filter */}
+          <div className="grid md:grid-cols-3 gap-4 mb-8">
+            {/* Search */}
+            <div className="md:col-span-2 relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+              <input
+                type="text"
+                placeholder="Search by company or position..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 rounded-lg bg-input border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 transition-colors"
+              />
+            </div>
+
+            {/* Filter */}
+            <div className="relative">
+              <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 rounded-lg bg-input border border-white/10 text-white focus:outline-none focus:border-purple-500/50 transition-colors"
+              >
+                <option value="all">All Status</option>
+                <option value="accepted">Accepted</option>
+                <option value="rejected">Rejected</option>
+                <option value="pending">Pending</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Applications Table */}
+          <div className="glassmorphism rounded-xl border border-white/10 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-white/10 bg-white/5">
+                    <th className="text-left py-4 px-6 text-gray-400 font-semibold">Company</th>
+                    <th className="text-left py-4 px-6 text-gray-400 font-semibold">Position</th>
+                    <th className="text-left py-4 px-6 text-gray-400 font-semibold">Platform</th>
+                    <th className="text-left py-4 px-6 text-gray-400 font-semibold">Status</th>
+                    <th className="text-left py-4 px-6 text-gray-400 font-semibold">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredApplications.map((app, index) => (
+                    <tr
+                      key={app.id}
+                      className="border-b border-white/5 hover:bg-white/5 transition-colors"
+                    >
+                      <td className="py-4 px-6">
+                        <div className="font-semibold text-white">{app.company}</div>
+                      </td>
+                      <td className="py-4 px-6 text-gray-300">{app.position}</td>
+                      <td className="py-4 px-6 text-gray-300">{app.platform}</td>
+                      <td className="py-4 px-6">
+                        <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border ${getStatusColor(app.status)}`}>
+                          {getStatusIcon(app.status)}
+                          <span className="capitalize font-medium">{app.status}</span>
+                        </div>
+                      </td>
+                      <td className="py-4 px-6 text-gray-400 text-sm">{app.date}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {filteredApplications.length === 0 && (
+              <div className="p-8 text-center">
+                <p className="text-gray-400 text-lg">No applications found</p>
+              </div>
+            )}
+          </div>
+
+          {/* Stats Cards */}
+          <div className="grid md:grid-cols-3 gap-6 mt-12">
+            <div className="glassmorphism p-6 rounded-lg border border-white/10 text-center">
+              <p className="text-gray-400 text-sm mb-2">Total Applications</p>
+              <p className="text-4xl font-bold text-cyan-400">{applications.length}</p>
+            </div>
+            <div className="glassmorphism p-6 rounded-lg border border-white/10 text-center">
+              <p className="text-gray-400 text-sm mb-2">Accepted</p>
+              <p className="text-4xl font-bold text-green-400">
+                {applications.filter((a) => a.status === 'accepted').length}
+              </p>
+            </div>
+            <div className="glassmorphism p-6 rounded-lg border border-white/10 text-center">
+              <p className="text-gray-400 text-sm mb-2">Rejected</p>
+              <p className="text-4xl font-bold text-red-400">
+                {applications.filter((a) => a.status === 'rejected').length}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+    </main>
+  );
+}
