@@ -1,35 +1,85 @@
-# -AutoApply-Agent
+# AutoApply
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [v0](https://v0.app).
+A powerful AI-powered job application automation platform that intelligently applies to hundreds of jobs across multiple platforms.
 
-## Built with v0
+## Project Structure
 
-This repository is linked to a [v0](https://v0.app) project. You can continue developing by visiting the link below -- start new chats to make changes, and v0 will push commits directly to this repo. Every merge to `main` will automatically deploy.
+```
+AutoApply-/
+├── frontend/          # All frontend code (Next.js application)
+│   ├── app/          # Next.js app directory
+│   ├── components/   # React components
+│   ├── hooks/        # Custom React hooks
+│   ├── lib/          # Utility functions
+│   ├── public/       # Static assets
+│   ├── styles/       # Global CSS
+│   ├── package.json
+│   ├── next.config.mjs
+│   ├── tailwind.config.ts
+│   └── tsconfig.json
+├── node_modules/     # Dependencies
+└── [git files]
 
-[Continue working on v0 →](https://v0.app/chat/projects/prj_qemXb0ad1CBVUWAvHJXLKaCLy6Xn)
+```
 
 ## Getting Started
 
-First, run the development server:
+### Development
+
+Navigate to the frontend folder and start the development server:
 
 ```bash
+cd frontend
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The application will be available at **http://localhost:3000**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Production Build
 
-## Learn More
+```bash
+cd frontend
+npm run build
+npm run start
+```
 
-To learn more, take a look at the following resources:
+## Technology Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [v0 Documentation](https://v0.app/docs) - learn about v0 and how to use it.
+- **Framework**: Next.js 16.2.0 with Turbopack
+- **Styling**: Tailwind CSS v4
+- **UI Components**: Custom components with glassmorphism design
+- **Icons**: Lucide React
+- **Charts**: Recharts
+- **Database**: Sonner (Toast notifications)
+- **Language**: TypeScript
 
-<a href="https://v0.app/chat/api/kiro/clone/amitabhanmolpain/-AutoApply-Agent" alt="Open in Kiro"><img src="https://pdgvvgmkdvyeydso.public.blob.vercel-storage.com/open%20in%20kiro.svg?sanitize=true" /></a>
+## Features
+
+- 🚀 Lightning-fast job applications with AI automation
+- 📊 Advanced analytics and tracking
+- 🤖 Smart job matching
+- 🔒 Secure & private data handling
+- 🌐 Multi-platform support (LinkedIn, Indeed, Intershala, Naukri.com, Wellfound)
+- 📱 Responsive design
+- ✨ Beautiful glassmorphism UI with animations
+
+## Available Scripts
+
+```bash
+# Development
+npm run dev
+
+# Production build
+npm run build
+
+# Start production server
+npm start
+
+# Lint and format
+npm run lint
+```
+
+---
+
+**All frontend development is now organized in the `frontend/` folder for better project structure and scalability.**
