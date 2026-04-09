@@ -9,12 +9,11 @@ interface SetupSectionProps {
 }
 
 const WEBSITES = [
-  { id: 'linkedin', name: 'LinkedIn', icon: '💼' },
-  { id: 'indeed', name: 'Indeed', icon: '🔍' },
-  { id: 'glassdoor', name: 'Glassdoor', icon: '🏢' },
-  { id: 'ziprecruiter', name: 'ZipRecruiter', icon: '🎯' },
-  { id: 'monster', name: 'Monster', icon: '👹' },
-  { id: 'dice', name: 'Dice', icon: '🎲' },
+  { id: 'linkedin', name: 'LinkedIn', icon: 'https://cdn-icons-png.flaticon.com/512/3536/3536505.png' },
+  { id: 'intershala', name: 'Intershala', icon: 'https://cdn.aptoide.com/imgs/c/3/1/c31c5e531ad94d917080d17066c31470_icon.png' },
+  { id: 'wellfound', name: 'Wellfound', icon: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_uvmLprvNSpkN84gOZSYVaGS6iyuiINTGdw&s' },
+  { id: 'indeed', name: 'Indeed', icon: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThz8Qi-G6jIHt6TmCOguWjOKGYYQPB1afpSQ&s' },
+  { id: 'naukri', name: 'Naukri.com', icon: 'https://static.naukimg.com/s/0/0/i/new-logos/naukri.png' },
 ]
 
 export function SetupSection({ onAutoApply }: SetupSectionProps) {
@@ -117,7 +116,7 @@ export function SetupSection({ onAutoApply }: SetupSectionProps) {
                     : 'border-border hover:border-border/80 bg-background/50'
                 }`}
               >
-                <span className="text-2xl">{website.icon}</span>
+                <img src={website.icon} alt={website.name} className="h-8 w-8 object-contain" />
                 <span className="flex-1 text-left font-medium text-foreground">
                   {website.name}
                 </span>

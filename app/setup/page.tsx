@@ -13,12 +13,11 @@ export default function Setup() {
   const [isApplying, setIsApplying] = useState(false);
 
   const platforms = [
-    { id: 'linkedin', name: 'LinkedIn', logo: '💼', color: 'from-blue-600 to-blue-700' },
-    { id: 'indeed', name: 'Indeed', logo: '🔍', color: 'from-blue-500 to-purple-600' },
-    { id: 'glassdoor', name: 'Glassdoor', logo: '💬', color: 'from-purple-500 to-pink-600' },
-    { id: 'ziprecruiter', name: 'ZipRecruiter', logo: '📝', color: 'from-orange-500 to-red-600' },
-    { id: 'monster', name: 'Monster', logo: '👾', color: 'from-purple-600 to-blue-700' },
-    { id: 'dice', name: 'Dice', logo: '🎯', color: 'from-red-500 to-orange-600' },
+    { id: 'linkedin', name: 'LinkedIn', logo: 'https://cdn-icons-png.flaticon.com/512/3536/3536505.png', color: 'from-blue-600 to-blue-700' },
+    { id: 'intershala', name: 'Intershala', logo: 'https://cdn.aptoide.com/imgs/c/3/1/c31c5e531ad94d917080d17066c31470_icon.png', color: 'from-blue-500 to-cyan-600' },
+    { id: 'wellfound', name: 'Wellfound', logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_uvmLprvNSpkN84gOZSYVaGS6iyuiINTGdw&s', color: 'from-orange-500 to-red-600' },
+    { id: 'indeed', name: 'Indeed', logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThz8Qi-G6jIHt6TmCOguWjOKGYYQPB1afpSQ&s', color: 'from-blue-600 to-purple-700' },
+    { id: 'naukri', name: 'Naukri.com', logo: 'https://static.naukimg.com/s/0/0/i/new-logos/naukri.png', color: 'from-blue-600 to-blue-700' },
   ];
 
   const handleResumeUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,8 +80,12 @@ export default function Setup() {
             </p>
           </div>
 
-          {/* Setup Form */}
-          <div className="glassmorphism p-8 md:p-12 rounded-2xl border border-white/10">
+          {/* Setup Form - Animated Background */}
+          <div className="glass-card p-8 md:p-12 rounded-2xl border border-white/10 backdrop-blur-xl relative overflow-hidden group">
+            {/* Animated gradient background */}
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-500 -z-10">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/30 via-transparent to-cyan-600/30 blur-2xl"></div>
+            </div>
             <div className="space-y-8">
               {/* Resume Upload */}
               <div>
@@ -90,10 +93,10 @@ export default function Setup() {
                   Upload Your Resume
                 </label>
                 <div
-                  className="border-2 border-dashed border-purple-500/50 rounded-xl p-8 text-center hover:border-purple-500/80 transition-colors cursor-pointer"
+                  className="border-2 border-dashed border-blue-500/50 rounded-xl p-8 text-center hover:border-blue-500/80 transition-colors cursor-pointer bg-white/2"
                   onClick={() => document.getElementById('resume-input')?.click()}
                 >
-                  <Upload className="w-12 h-12 text-purple-400 mx-auto mb-3" />
+                  <Upload className="w-12 h-12 text-blue-400 mx-auto mb-3" />
                   {resumeFile ? (
                     <div>
                       <p className="text-white font-semibold">{resumeFile.name}</p>
@@ -145,7 +148,14 @@ export default function Setup() {
                       <div className={`absolute inset-0 border rounded-xl transition-colors ${selectedPlatforms.includes(platform.id) ? 'border-white/40' : 'border-white/10 group-hover:border-white/20'}`}></div>
                       
                       <div className="relative z-10 flex flex-col items-center gap-3">
-                        <div className="text-5xl transform group-hover:scale-110 transition-transform">{platform.logo}</div>
+                        <div className="w-16 h-16 group-hover:scale-125 transition-all duration-500 flex items-center justify-center">
+                          <img 
+                            src={platform.logo} 
+                            alt={platform.name}
+                            className="w-full h-full object-contain group-hover:drop-shadow-[0_0_16px_rgba(96,165,250,0.8)] transition-all duration-500"
+                            loading="lazy"
+                          />
+                        </div>
                         <p className="font-bold text-white text-sm group-hover:text-white transition-colors">{platform.name}</p>
                         {selectedPlatforms.includes(platform.id) && (
                           <CheckCircle2 className="w-5 h-5 text-green-400 mt-2" />

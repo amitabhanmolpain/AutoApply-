@@ -22,7 +22,7 @@ export default function Dashboard() {
       title: 'Start Auto Apply',
       description: 'Launch automated job applications across all platforms',
       href: '/setup',
-      color: 'from-purple-500 to-purple-600',
+      color: 'from-blue-500 to-cyan-600',
     },
     {
       icon: BarChart3,
@@ -48,9 +48,9 @@ export default function Dashboard() {
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-purple-500/30 bg-purple-500/10 mb-6">
-              <Sparkles className="w-4 h-4 text-purple-400" />
-              <span className="text-sm text-purple-300">Welcome to AutoApply</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-400/30 bg-blue-500/10 mb-6 glassmorphism-sm hover:bg-blue-500/15 transition-all duration-300">
+              <Sparkles className="w-4 h-4 text-blue-300" />
+              <span className="text-sm text-blue-200">Welcome to AutoApply</span>
             </div>
             <h1 className="text-5xl md:text-6xl font-bold mb-6 text-white">
               <span className="gradient-text">Command Center</span>
@@ -64,22 +64,41 @@ export default function Dashboard() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             {dashboardItems.map((item, index) => {
               const Icon = item.icon;
+              const gradients = [
+                'from-blue-600/20 to-cyan-600/20',
+                'from-cyan-600/20 to-blue-600/20',
+                'from-blue-500/20 to-purple-600/20',
+                'from-purple-600/20 to-blue-500/20',
+              ];
+              const gradient = gradients[index % gradients.length];
+              
               return (
                 <Link
                   key={index}
                   href={item.href}
-                  className="group relative overflow-hidden rounded-xl p-6 transition-all duration-300 hover:scale-105 cursor-pointer"
+                  className="group relative h-full rounded-2xl overflow-hidden transition-all duration-500 hover:scale-105 cursor-pointer"
                 >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-5 group-hover:opacity-10 transition-opacity`}></div>
-                  <div className={`absolute inset-0 border border-transparent group-hover:border-white/20 rounded-xl transition-colors`}></div>
+                  {/* Base background */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/1 opacity-50"></div>
                   
-                  <div className="relative z-10">
-                    <div className={`w-12 h-12 bg-gradient-to-br ${item.color} rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                      <Icon className="w-6 h-6 text-white" />
+                  {/* Animated gradient on hover */}
+                  <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-50 transition-opacity duration-500`}></div>
+                  
+                  {/* Border */}
+                  <div className="absolute inset-0 rounded-2xl border border-white/20 group-hover:border-white/40 transition-all duration-500"></div>
+                  
+                  {/* Glow effect on hover */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-500">
+                    <div className={`absolute inset-0 bg-gradient-to-br ${item.color} blur-2xl`}></div>
+                  </div>
+                  
+                  <div className="relative z-10 h-full p-6 flex flex-col">
+                    <div className={`w-14 h-14 bg-gradient-to-br ${item.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-125 group-hover:shadow-2xl group-hover:shadow-blue-500/50 transition-all duration-500 neon-glow-blue`}>
+                      <Icon className="w-7 h-7 text-white" />
                     </div>
-                    <h3 className="text-lg font-bold text-white mb-2">{item.title}</h3>
-                    <p className="text-gray-400 text-sm mb-4">{item.description}</p>
-                    <div className="text-purple-400 text-sm font-semibold group-hover:text-purple-300 transition-colors">
+                    <h3 className="text-lg font-bold text-white mb-2 group-hover:text-cyan-200 transition-colors duration-300">{item.title}</h3>
+                    <p className="text-gray-300 text-sm mb-4 group-hover:text-gray-100 transition-colors duration-300 flex-grow">{item.description}</p>
+                    <div className="text-blue-400 text-sm font-semibold group-hover:text-blue-300 transition-colors">
                       Get Started →
                     </div>
                   </div>
@@ -89,25 +108,26 @@ export default function Dashboard() {
           </div>
 
           {/* Quick Stats */}
-          <div className="glassmorphism p-8 rounded-xl border border-white/10">
+          <div className="glass-card p-8 rounded-2xl border border-white/10 backdrop-blur-xl">
             <h2 className="text-2xl font-bold text-white mb-8">Your Stats</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <div className="group p-4 rounded-lg border border-white/10 group-hover:border-cyan-500/30 transition-colors">
-                <div className="text-3xl font-bold text-cyan-400 mb-2 group-hover:scale-110 transition-transform origin-left">0</div>
-                <div className="text-sm text-gray-400">Applications</div>
-              </div>
-              <div className="group p-4 rounded-lg border border-white/10 group-hover:border-green-500/30 transition-colors">
-                <div className="text-3xl font-bold text-green-400 mb-2 group-hover:scale-110 transition-transform origin-left">0</div>
-                <div className="text-sm text-gray-400">Accepted</div>
-              </div>
-              <div className="group p-4 rounded-lg border border-white/10 group-hover:border-red-500/30 transition-colors">
-                <div className="text-3xl font-bold text-red-400 mb-2 group-hover:scale-110 transition-transform origin-left">0</div>
-                <div className="text-sm text-gray-400">Rejected</div>
-              </div>
-              <div className="group p-4 rounded-lg border border-white/10 group-hover:border-yellow-500/30 transition-colors">
-                <div className="text-3xl font-bold text-yellow-400 mb-2 group-hover:scale-110 transition-transform origin-left">0</div>
-                <div className="text-sm text-gray-400">Pending</div>
-              </div>
+              {[
+                { label: 'Applications', value: '0', color: 'cyan', colorClass: 'text-cyan-400', glowColor: 'from-cyan-500' },
+                { label: 'Accepted', value: '0', color: 'green', colorClass: 'text-green-400', glowColor: 'from-green-500' },
+                { label: 'Rejected', value: '0', color: 'red', colorClass: 'text-red-400', glowColor: 'from-red-500' },
+                { label: 'Pending', value: '0', color: 'yellow', colorClass: 'text-yellow-400', glowColor: 'from-yellow-500' },
+              ].map((stat, idx) => (
+                <div key={idx} className="group relative h-full rounded-lg overflow-hidden border border-white/10 group-hover:border-white/30 transition-all duration-500">
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/1 opacity-50"></div>
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-40 transition-opacity duration-500">
+                    <div className={`absolute inset-0 bg-gradient-to-br ${stat.glowColor} to-transparent blur-xl`}></div>
+                  </div>
+                  <div className="relative z-10 p-4">
+                    <div className={`${stat.colorClass} text-3xl font-bold mb-2 group-hover:scale-125 group-hover:drop-shadow-[0_0_8px_rgba(96,165,250,0.5)] transition-all duration-300 origin-left`}>{stat.value}</div>
+                    <div className="text-sm text-gray-300 group-hover:text-gray-100 transition-colors duration-300">{stat.label}</div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

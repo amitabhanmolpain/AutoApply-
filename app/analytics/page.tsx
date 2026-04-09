@@ -63,7 +63,7 @@ export default function Analytics() {
   ];
 
   const metrics = [
-    { label: 'Total Applications', value: '113', icon: Zap, color: 'from-purple-500 to-purple-600', change: '+24%' },
+    { label: 'Total Applications', value: '113', icon: Zap, color: 'from-blue-500 to-blue-600', change: '+24%' },
     { label: 'Success Rate', value: '24.8%', icon: TrendingUp, color: 'from-green-500 to-emerald-600', change: '+8%' },
     { label: 'Active Interviews', value: '12', icon: Activity, color: 'from-cyan-500 to-blue-600', change: '+3' },
     { label: 'Avg Response Time', value: '2.3d', icon: Clock, color: 'from-orange-500 to-red-600', change: '-0.5d' },
@@ -89,20 +89,41 @@ export default function Analytics() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             {metrics.map((metric, index) => {
               const Icon = metric.icon;
+              const gradients = [
+                'from-blue-600/20 to-cyan-600/20',
+                'from-green-600/20 to-emerald-600/20',
+                'from-cyan-600/20 to-blue-600/20',
+                'from-orange-600/20 to-red-600/20',
+              ];
+              const gradient = gradients[index % gradients.length];
+              
               return (
-                <div key={index} className="group relative overflow-hidden rounded-xl p-6 border border-white/10 hover:border-white/30 transition-all duration-300">
-                  <div className={`absolute inset-0 bg-gradient-to-br ${metric.color} opacity-5 group-hover:opacity-10 transition-opacity`}></div>
-                  <div className="relative z-10">
+                <div key={index} className="group relative h-full rounded-2xl overflow-hidden transition-all duration-500 hover:scale-105">
+                  {/* Base background */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/1 opacity-50"></div>
+                  
+                  {/* Animated gradient on hover */}
+                  <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-50 transition-opacity duration-500`}></div>
+                  
+                  {/* Border */}
+                  <div className="absolute inset-0 rounded-2xl border border-white/20 group-hover:border-white/40 transition-all duration-500"></div>
+                  
+                  {/* Glow effect on hover */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-500">
+                    <div className={`absolute inset-0 bg-gradient-to-br ${metric.color} blur-2xl`}></div>
+                  </div>
+
+                  <div className="relative z-10 h-full p-6 flex flex-col">
                     <div className="flex justify-between items-start mb-4">
-                      <div className={`w-12 h-12 bg-gradient-to-br ${metric.color} rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                      <div className={`w-12 h-12 bg-gradient-to-br ${metric.color} rounded-lg flex items-center justify-center group-hover:scale-125 group-hover:shadow-2xl transition-all duration-500 neon-glow`}>
                         <Icon className="w-6 h-6 text-white" />
                       </div>
                       <span className={`text-sm font-bold ${metric.change.startsWith('+') && !metric.change.includes('d') ? 'text-green-400' : metric.change.includes('-') ? 'text-green-400' : 'text-cyan-400'}`}>
                         {metric.change}
                       </span>
                     </div>
-                    <p className="text-gray-400 text-sm mb-2">{metric.label}</p>
-                    <p className="text-3xl font-bold text-white">{metric.value}</p>
+                    <p className="text-gray-300 text-sm mb-2 group-hover:text-gray-100 transition-colors duration-300">{metric.label}</p>
+                    <p className="text-3xl font-bold text-white group-hover:text-cyan-200 transition-colors duration-300">{metric.value}</p>
                   </div>
                 </div>
               );
@@ -112,18 +133,18 @@ export default function Analytics() {
           {/* Charts Grid */}
           <div className="grid lg:grid-cols-2 gap-8 mb-8">
             {/* Area Chart - Applications Trend */}
-            <div className="glassmorphism p-8 rounded-xl border border-white/10">
+            <div className="glass-card p-8 rounded-2xl border border-white/10 backdrop-blur-xl">
               <h2 className="text-2xl font-bold text-white mb-6">Applications Growth</h2>
               <ResponsiveContainer width="100%" height={350}>
                 <AreaChart data={applicationData}>
                   <defs>
                     <linearGradient id="colorApplications" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor="#7c3aed" stopOpacity={0.1}/>
+                      <stop offset="5%" stopColor="#60a5fa" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#60a5fa" stopOpacity={0.1}/>
                     </linearGradient>
                     <linearGradient id="colorInterviews" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor="#06b6d4" stopOpacity={0.1}/>
+                      <stop offset="5%" stopColor="#38bdf8" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#38bdf8" stopOpacity={0.1}/>
                     </linearGradient>
                     <linearGradient id="colorOffers" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
@@ -135,22 +156,23 @@ export default function Analytics() {
                   <YAxis stroke="#999" />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#1a1f3a',
-                      border: '1px solid rgba(255,255,255,0.1)',
+                      backgroundColor: 'rgba(0,0,0,0.5)',
+                      border: '1px solid rgba(255,255,255,0.2)',
                       borderRadius: '8px',
-                      color: '#f0f4ff',
+                      color: '#ffffff',
+                      backdropFilter: 'blur(10px)',
                     }}
                   />
                   <Legend />
-                  <Area type="monotone" dataKey="applications" stroke="#7c3aed" fillOpacity={1} fill="url(#colorApplications)" name="Total Apps" />
-                  <Area type="monotone" dataKey="interviews" stroke="#06b6d4" fillOpacity={1} fill="url(#colorInterviews)" name="Interviews" />
+                  <Area type="monotone" dataKey="applications" stroke="#60a5fa" fillOpacity={1} fill="url(#colorApplications)" name="Total Apps" />
+                  <Area type="monotone" dataKey="interviews" stroke="#38bdf8" fillOpacity={1} fill="url(#colorInterviews)" name="Interviews" />
                   <Area type="monotone" dataKey="offers" stroke="#10b981" fillOpacity={1} fill="url(#colorOffers)" name="Offers" />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
 
             {/* Donut Chart - Status Distribution */}
-            <div className="glassmorphism p-8 rounded-xl border border-white/10">
+            <div className="glass-card p-8 rounded-2xl border border-white/10 backdrop-blur-xl">
               <h2 className="text-2xl font-bold text-white mb-6">Application Status</h2>
               <ResponsiveContainer width="100%" height={350}>
                 <PieChart>
@@ -169,10 +191,11 @@ export default function Analytics() {
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#1a1f3a',
-                      border: '1px solid rgba(255,255,255,0.1)',
+                      backgroundColor: 'rgba(0,0,0,0.5)',
+                      border: '1px solid rgba(255,255,255,0.2)',
                       borderRadius: '8px',
-                      color: '#f0f4ff',
+                      color: '#ffffff',
+                      backdropFilter: 'blur(10px)',
                     }}
                   />
                 </PieChart>
@@ -183,7 +206,7 @@ export default function Analytics() {
           {/* Bottom Charts */}
           <div className="grid lg:grid-cols-2 gap-8">
             {/* Hourly Activity */}
-            <div className="glassmorphism p-8 rounded-xl border border-white/10">
+            <div className="glass-card p-8 rounded-2xl border border-white/10 backdrop-blur-xl">
               <h2 className="text-2xl font-bold text-white mb-6">Hourly Activity Pattern</h2>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={hourlyData}>
@@ -192,19 +215,20 @@ export default function Analytics() {
                   <YAxis stroke="#999" />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#1a1f3a',
-                      border: '1px solid rgba(255,255,255,0.1)',
+                      backgroundColor: 'rgba(0,0,0,0.5)',
+                      border: '1px solid rgba(255,255,255,0.2)',
                       borderRadius: '8px',
-                      color: '#f0f4ff',
+                      color: '#ffffff',
+                      backdropFilter: 'blur(10px)',
                     }}
                   />
-                  <Bar dataKey="applications" fill="#06b6d4" radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="applications" fill="#38bdf8" radius={[8, 8, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
 
             {/* Platform Distribution */}
-            <div className="glassmorphism p-8 rounded-xl border border-white/10">
+            <div className="glass-card p-8 rounded-2xl border border-white/10 backdrop-blur-xl">
               <h2 className="text-2xl font-bold text-white mb-6">Applications by Platform</h2>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart
@@ -217,20 +241,21 @@ export default function Analytics() {
                   <YAxis dataKey="platform" type="category" stroke="#999" width={90} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#1a1f3a',
-                      border: '1px solid rgba(255,255,255,0.1)',
+                      backgroundColor: 'rgba(0,0,0,0.5)',
+                      border: '1px solid rgba(255,255,255,0.2)',
                       borderRadius: '8px',
-                      color: '#f0f4ff',
+                      color: '#ffffff',
+                      backdropFilter: 'blur(10px)',
                     }}
                   />
-                  <Bar dataKey="value" fill="#7c3aed" radius={[0, 8, 8, 0]} />
+                  <Bar dataKey="value" fill="#60a5fa" radius={[0, 8, 8, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
 
           {/* Status Summary Table */}
-          <div className="mt-8 glassmorphism p-8 rounded-xl border border-white/10 overflow-x-auto">
+          <div className="mt-8 glass-card p-8 rounded-2xl border border-white/10 overflow-x-auto backdrop-blur-xl">
             <h2 className="text-2xl font-bold text-white mb-6">Status Breakdown</h2>
             <table className="w-full">
               <thead>

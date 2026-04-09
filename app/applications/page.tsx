@@ -107,19 +107,19 @@ export default function Applications() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-white/10 bg-white/5">
-                    <th className="text-left py-4 px-6 text-gray-400 font-semibold">Company</th>
-                    <th className="text-left py-4 px-6 text-gray-400 font-semibold">Position</th>
-                    <th className="text-left py-4 px-6 text-gray-400 font-semibold">Platform</th>
-                    <th className="text-left py-4 px-6 text-gray-400 font-semibold">Status</th>
-                    <th className="text-left py-4 px-6 text-gray-400 font-semibold">Date</th>
+                  <tr className="border-b border-white/10 bg-gradient-to-r from-white/5 to-white/1">
+                    <th className="text-left py-4 px-6 text-gray-300 font-semibold">Company</th>
+                    <th className="text-left py-4 px-6 text-gray-300 font-semibold">Position</th>
+                    <th className="text-left py-4 px-6 text-gray-300 font-semibold">Platform</th>
+                    <th className="text-left py-4 px-6 text-gray-300 font-semibold">Status</th>
+                    <th className="text-left py-4 px-6 text-gray-300 font-semibold">Date</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredApplications.map((app, index) => (
                     <tr
                       key={app.id}
-                      className="border-b border-white/5 hover:bg-white/5 transition-colors"
+                      className="border-b border-white/5 hover:bg-gradient-to-r hover:from-white/8 hover:to-white/3 transition-all duration-300"
                     >
                       <td className="py-4 px-6">
                         <div className="font-semibold text-white">{app.company}</div>
@@ -153,27 +153,47 @@ export default function Applications() {
 
           {/* Stats Cards */}
           <div className="grid md:grid-cols-3 gap-6 mt-12">
-            <div className="group relative overflow-hidden rounded-xl p-8 border border-cyan-500/30 text-center hover:border-cyan-500/50 transition-all">
-              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <div className="relative z-10">
-                <p className="text-gray-400 text-sm mb-3">Total Applications</p>
-                <p className="text-5xl font-bold text-cyan-400">{applications.length}</p>
+            {/* Total Applications */}
+            <div className="group relative h-full rounded-xl overflow-hidden transition-all duration-500 hover:scale-105">
+              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/1 opacity-50"></div>
+              <div className={`absolute inset-0 bg-gradient-to-br from-cyan-600/20 to-blue-600/20 opacity-0 group-hover:opacity-50 transition-opacity duration-500`}></div>
+              <div className="absolute inset-0 rounded-xl border border-white/20 group-hover:border-white/40 transition-all duration-500"></div>
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-500">
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 to-blue-500 blur-2xl"></div>
+              </div>
+              <div className="relative z-10 p-8 text-center h-full flex flex-col justify-center">
+                <p className="text-gray-300 text-sm mb-3 group-hover:text-gray-100 transition-colors duration-300">Total Applications</p>
+                <p className="text-5xl font-bold text-cyan-400 group-hover:text-cyan-200 group-hover:scale-110 transition-all origin-center duration-300">{applications.length}</p>
               </div>
             </div>
-            <div className="group relative overflow-hidden rounded-xl p-8 border border-green-500/30 text-center hover:border-green-500/50 transition-all">
-              <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <div className="relative z-10">
-                <p className="text-gray-400 text-sm mb-3">Accepted</p>
-                <p className="text-5xl font-bold text-green-400">
+
+            {/* Accepted */}
+            <div className="group relative h-full rounded-xl overflow-hidden transition-all duration-500 hover:scale-105">
+              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/1 opacity-50"></div>
+              <div className={`absolute inset-0 bg-gradient-to-br from-green-600/20 to-emerald-600/20 opacity-0 group-hover:opacity-50 transition-opacity duration-500`}></div>
+              <div className="absolute inset-0 rounded-xl border border-white/20 group-hover:border-white/40 transition-all duration-500"></div>
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-500">
+                <div className="absolute inset-0 bg-gradient-to-br from-green-500 to-emerald-500 blur-2xl"></div>
+              </div>
+              <div className="relative z-10 p-8 text-center h-full flex flex-col justify-center">
+                <p className="text-gray-300 text-sm mb-3 group-hover:text-gray-100 transition-colors duration-300">Accepted</p>
+                <p className="text-5xl font-bold text-green-400 group-hover:text-green-200 group-hover:scale-110 transition-all origin-center duration-300">
                   {applications.filter((a) => a.status === 'accepted').length}
                 </p>
               </div>
             </div>
-            <div className="group relative overflow-hidden rounded-xl p-8 border border-red-500/30 text-center hover:border-red-500/50 transition-all">
-              <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <div className="relative z-10">
-                <p className="text-gray-400 text-sm mb-3">Rejected</p>
-                <p className="text-5xl font-bold text-red-400">
+
+            {/* Rejected */}
+            <div className="group relative h-full rounded-xl overflow-hidden transition-all duration-500 hover:scale-105">
+              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/1 opacity-50"></div>
+              <div className={`absolute inset-0 bg-gradient-to-br from-red-600/20 to-orange-600/20 opacity-0 group-hover:opacity-50 transition-opacity duration-500`}></div>
+              <div className="absolute inset-0 rounded-xl border border-white/20 group-hover:border-white/40 transition-all duration-500"></div>
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-500">
+                <div className="absolute inset-0 bg-gradient-to-br from-red-500 to-orange-500 blur-2xl"></div>
+              </div>
+              <div className="relative z-10 p-8 text-center h-full flex flex-col justify-center">
+                <p className="text-gray-300 text-sm mb-3 group-hover:text-gray-100 transition-colors duration-300">Rejected</p>
+                <p className="text-5xl font-bold text-red-400 group-hover:text-red-200 group-hover:scale-110 transition-all origin-center duration-300">
                   {applications.filter((a) => a.status === 'rejected').length}
                 </p>
               </div>
