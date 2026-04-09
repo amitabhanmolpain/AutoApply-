@@ -48,12 +48,12 @@ export default function Home() {
   ];
 
   const jobPlatforms = [
-    { name: 'LinkedIn', logo: '💼' },
-    { name: 'Indeed', logo: '🔍' },
-    { name: 'Glassdoor', logo: '💬' },
-    { name: 'ZipRecruiter', logo: '📝' },
-    { name: 'Monster', logo: '👹' },
-    { name: 'Dice', logo: '🎲' },
+    { name: 'LinkedIn', color: 'from-blue-600 to-blue-700', icon: '💼' },
+    { name: 'Indeed', color: 'from-blue-500 to-purple-600', icon: '🔍' },
+    { name: 'Glassdoor', color: 'from-purple-500 to-pink-600', icon: '💬' },
+    { name: 'ZipRecruiter', color: 'from-orange-500 to-red-600', icon: '📝' },
+    { name: 'Monster', color: 'from-purple-600 to-blue-700', icon: '👾' },
+    { name: 'Dice', color: 'from-red-500 to-orange-600', icon: '🎯' },
   ];
 
   return (
@@ -75,14 +75,14 @@ export default function Home() {
           </div>
 
           <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-            <span className="gradient-text">Automate Your Job Hunt</span>
+            <span className="gradient-text">Land Your Dream Job</span>
             <br />
-            <span className="text-white">with AI Precision</span>
+            <span className="text-white">While We Apply</span>
           </h1>
 
           <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed">
-            JobBot applies to hundreds of jobs automatically across all major platforms. 
-            Upload your resume, set your preferences, and let AI handle the rest while you focus on what matters.
+            AutoApply intelligently applies to hundreds of jobs across LinkedIn, Indeed, Glassdoor, and more. 
+            Upload your resume once and let AI handle the rest while you focus on interviews.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
@@ -125,10 +125,14 @@ export default function Home() {
             {jobPlatforms.map((platform) => (
               <div 
                 key={platform.name}
-                className="glassmorphism p-6 rounded-lg text-center hover:border-purple-500/50 transition-all duration-300 hover:scale-105"
+                className={`group relative overflow-hidden rounded-xl p-6 text-center transition-all duration-300 hover:scale-110 cursor-pointer`}
               >
-                <div className="text-4xl mb-3">{platform.logo}</div>
-                <p className="text-sm font-semibold text-gray-300">{platform.name}</p>
+                <div className={`absolute inset-0 bg-gradient-to-br ${platform.color} opacity-10 group-hover:opacity-20 transition-opacity`}></div>
+                <div className={`absolute inset-0 border border-transparent group-hover:border-white/20 rounded-xl transition-colors`}></div>
+                <div className="relative z-10 flex flex-col items-center gap-3">
+                  <div className="text-5xl">{platform.icon}</div>
+                  <p className="text-xs font-bold text-gray-200 group-hover:text-white transition-colors">{platform.name}</p>
+                </div>
               </div>
             ))}
           </div>

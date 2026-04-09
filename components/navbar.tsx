@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { Menu, X, Zap } from 'lucide-react';
+import { Menu, X, Rocket } from 'lucide-react';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,11 +25,14 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-lg flex items-center justify-center neon-glow">
-              <Zap className="w-6 h-6 text-white" />
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 via-purple-600 to-cyan-500 rounded-xl flex items-center justify-center neon-glow group-hover:scale-110 transition-transform">
+              <Rocket className="w-6 h-6 text-white" />
             </div>
-            <span className="font-bold text-lg gradient-text hidden sm:block">JobBot</span>
+            <div className="hidden sm:flex flex-col">
+              <span className="font-bold text-lg gradient-text">AutoApply</span>
+              <span className="text-xs text-cyan-400/70">Job Automation</span>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}

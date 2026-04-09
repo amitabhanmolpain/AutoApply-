@@ -13,12 +13,12 @@ export default function Setup() {
   const [isApplying, setIsApplying] = useState(false);
 
   const platforms = [
-    { id: 'linkedin', name: 'LinkedIn', logo: '💼' },
-    { id: 'indeed', name: 'Indeed', logo: '🔍' },
-    { id: 'glassdoor', name: 'Glassdoor', logo: '💬' },
-    { id: 'ziprecruiter', name: 'ZipRecruiter', logo: '📝' },
-    { id: 'monster', name: 'Monster', logo: '👹' },
-    { id: 'dice', name: 'Dice', logo: '🎲' },
+    { id: 'linkedin', name: 'LinkedIn', logo: '💼', color: 'from-blue-600 to-blue-700' },
+    { id: 'indeed', name: 'Indeed', logo: '🔍', color: 'from-blue-500 to-purple-600' },
+    { id: 'glassdoor', name: 'Glassdoor', logo: '💬', color: 'from-purple-500 to-pink-600' },
+    { id: 'ziprecruiter', name: 'ZipRecruiter', logo: '📝', color: 'from-orange-500 to-red-600' },
+    { id: 'monster', name: 'Monster', logo: '👾', color: 'from-purple-600 to-blue-700' },
+    { id: 'dice', name: 'Dice', logo: '🎯', color: 'from-red-500 to-orange-600' },
   ];
 
   const handleResumeUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -131,7 +131,7 @@ export default function Setup() {
 
               {/* Platform Selection */}
               <div>
-                <label className="block text-lg font-semibold text-white mb-4">
+                <label className="block text-lg font-semibold text-white mb-6">
                   Select Job Platforms
                 </label>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -139,19 +139,18 @@ export default function Setup() {
                     <button
                       key={platform.id}
                       onClick={() => togglePlatform(platform.id)}
-                      className={`p-4 rounded-lg border transition-all duration-300 flex items-center gap-3 font-medium ${
-                        selectedPlatforms.includes(platform.id)
-                          ? 'border-purple-500/50 bg-purple-500/10 text-purple-300'
-                          : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/20'
-                      }`}
+                      className="group relative overflow-hidden rounded-xl p-6 transition-all duration-300 hover:scale-105"
                     >
-                      <span className="text-2xl">{platform.logo}</span>
-                      <div className="text-left">
-                        <p>{platform.name}</p>
+                      <div className={`absolute inset-0 bg-gradient-to-br ${platform.color} ${selectedPlatforms.includes(platform.id) ? 'opacity-20' : 'opacity-0'} group-hover:opacity-15 transition-opacity`}></div>
+                      <div className={`absolute inset-0 border rounded-xl transition-colors ${selectedPlatforms.includes(platform.id) ? 'border-white/40' : 'border-white/10 group-hover:border-white/20'}`}></div>
+                      
+                      <div className="relative z-10 flex flex-col items-center gap-3">
+                        <div className="text-5xl transform group-hover:scale-110 transition-transform">{platform.logo}</div>
+                        <p className="font-bold text-white text-sm group-hover:text-white transition-colors">{platform.name}</p>
+                        {selectedPlatforms.includes(platform.id) && (
+                          <CheckCircle2 className="w-5 h-5 text-green-400 mt-2" />
+                        )}
                       </div>
-                      {selectedPlatforms.includes(platform.id) && (
-                        <CheckCircle2 className="w-5 h-5 ml-auto text-purple-400" />
-                      )}
                     </button>
                   ))}
                 </div>
@@ -168,10 +167,14 @@ export default function Setup() {
               </button>
 
               {/* Info Box */}
-              <div className="bg-cyan-500/10 border border-cyan-500/30 rounded-lg p-4">
-                <p className="text-cyan-300 text-sm">
-                  <strong>Pro Tip:</strong> JobBot will analyze your resume and apply to matching job postings across all selected platforms. You can track all applications in the Analytics section.
-                </p>
+              <div className="relative overflow-hidden rounded-xl p-6 border border-cyan-500/30">
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10"></div>
+                <div className="relative z-10 flex items-start gap-4">
+                  <Zap className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-1" />
+                  <p className="text-gray-200 text-sm">
+                    <strong className="text-cyan-300">Auto Apply Magic:</strong> AutoApply analyzes your resume and applies to matching opportunities across all selected platforms. Track your progress and get notified for interviews in the Analytics dashboard.
+                  </p>
+                </div>
               </div>
             </div>
           </div>

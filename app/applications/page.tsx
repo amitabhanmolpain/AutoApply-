@@ -10,14 +10,16 @@ export default function Applications() {
   const [filterStatus, setFilterStatus] = useState('all');
 
   const applications = [
-    { id: 1, company: 'Google', position: 'Senior Software Engineer', platform: '💼 LinkedIn', status: 'accepted', date: '2024-01-15' },
-    { id: 2, company: 'Microsoft', position: 'Product Manager', platform: '🔍 Indeed', status: 'pending', date: '2024-01-14' },
-    { id: 3, company: 'Amazon', position: 'Data Scientist', platform: '💬 Glassdoor', status: 'rejected', date: '2024-01-13' },
-    { id: 4, company: 'Meta', position: 'Full Stack Engineer', platform: '📝 ZipRecruiter', status: 'accepted', date: '2024-01-12' },
-    { id: 5, company: 'Apple', position: 'DevOps Engineer', platform: '👹 Monster', status: 'pending', date: '2024-01-11' },
-    { id: 6, company: 'Netflix', position: 'Backend Engineer', platform: '🎲 Dice', status: 'accepted', date: '2024-01-10' },
-    { id: 7, company: 'Tesla', position: 'ML Engineer', platform: '💼 LinkedIn', status: 'rejected', date: '2024-01-09' },
-    { id: 8, company: 'Stripe', position: 'Software Engineer', platform: '🔍 Indeed', status: 'pending', date: '2024-01-08' },
+    { id: 1, company: 'Google', position: 'Senior Software Engineer', platform: 'LinkedIn', icon: '💼', status: 'accepted', date: '2024-01-15' },
+    { id: 2, company: 'Microsoft', position: 'Product Manager', platform: 'Indeed', icon: '🔍', status: 'pending', date: '2024-01-14' },
+    { id: 3, company: 'Amazon', position: 'Data Scientist', platform: 'Glassdoor', icon: '💬', status: 'rejected', date: '2024-01-13' },
+    { id: 4, company: 'Meta', position: 'Full Stack Engineer', platform: 'ZipRecruiter', icon: '📝', status: 'accepted', date: '2024-01-12' },
+    { id: 5, company: 'Apple', position: 'DevOps Engineer', platform: 'Monster', icon: '👾', status: 'pending', date: '2024-01-11' },
+    { id: 6, company: 'Netflix', position: 'Backend Engineer', platform: 'Dice', icon: '🎯', status: 'accepted', date: '2024-01-10' },
+    { id: 7, company: 'Tesla', position: 'ML Engineer', platform: 'LinkedIn', icon: '💼', status: 'rejected', date: '2024-01-09' },
+    { id: 8, company: 'Stripe', position: 'Software Engineer', platform: 'Indeed', icon: '🔍', status: 'pending', date: '2024-01-08' },
+    { id: 9, company: 'Airbnb', position: 'Frontend Engineer', platform: 'Glassdoor', icon: '💬', status: 'accepted', date: '2024-01-07' },
+    { id: 10, company: 'Uber', position: 'Systems Engineer', platform: 'LinkedIn', icon: '💼', status: 'pending', date: '2024-01-06' },
   ];
 
   const getStatusIcon = (status: string) => {
@@ -123,7 +125,12 @@ export default function Applications() {
                         <div className="font-semibold text-white">{app.company}</div>
                       </td>
                       <td className="py-4 px-6 text-gray-300">{app.position}</td>
-                      <td className="py-4 px-6 text-gray-300">{app.platform}</td>
+                      <td className="py-4 px-6">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-white/5 border border-white/10">
+                          <span className="text-lg">{app.icon}</span>
+                          <span className="text-sm text-gray-300 font-medium">{app.platform}</span>
+                        </div>
+                      </td>
                       <td className="py-4 px-6">
                         <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border ${getStatusColor(app.status)}`}>
                           {getStatusIcon(app.status)}
@@ -146,21 +153,30 @@ export default function Applications() {
 
           {/* Stats Cards */}
           <div className="grid md:grid-cols-3 gap-6 mt-12">
-            <div className="glassmorphism p-6 rounded-lg border border-white/10 text-center">
-              <p className="text-gray-400 text-sm mb-2">Total Applications</p>
-              <p className="text-4xl font-bold text-cyan-400">{applications.length}</p>
+            <div className="group relative overflow-hidden rounded-xl p-8 border border-cyan-500/30 text-center hover:border-cyan-500/50 transition-all">
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="relative z-10">
+                <p className="text-gray-400 text-sm mb-3">Total Applications</p>
+                <p className="text-5xl font-bold text-cyan-400">{applications.length}</p>
+              </div>
             </div>
-            <div className="glassmorphism p-6 rounded-lg border border-white/10 text-center">
-              <p className="text-gray-400 text-sm mb-2">Accepted</p>
-              <p className="text-4xl font-bold text-green-400">
-                {applications.filter((a) => a.status === 'accepted').length}
-              </p>
+            <div className="group relative overflow-hidden rounded-xl p-8 border border-green-500/30 text-center hover:border-green-500/50 transition-all">
+              <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="relative z-10">
+                <p className="text-gray-400 text-sm mb-3">Accepted</p>
+                <p className="text-5xl font-bold text-green-400">
+                  {applications.filter((a) => a.status === 'accepted').length}
+                </p>
+              </div>
             </div>
-            <div className="glassmorphism p-6 rounded-lg border border-white/10 text-center">
-              <p className="text-gray-400 text-sm mb-2">Rejected</p>
-              <p className="text-4xl font-bold text-red-400">
-                {applications.filter((a) => a.status === 'rejected').length}
-              </p>
+            <div className="group relative overflow-hidden rounded-xl p-8 border border-red-500/30 text-center hover:border-red-500/50 transition-all">
+              <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="relative z-10">
+                <p className="text-gray-400 text-sm mb-3">Rejected</p>
+                <p className="text-5xl font-bold text-red-400">
+                  {applications.filter((a) => a.status === 'rejected').length}
+                </p>
+              </div>
             </div>
           </div>
         </div>
