@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "AutoApply - Job Application Autofill",
   "version": "1.0.0",
-  "description": "Automatically fill job applications on LinkedIn, Internshala, Wellfound, and Indeed",
+  "description": "Automatically fill job applications on LinkedIn, Intershala, Wellfound, Indeed, and Naukri.com",
   
   "permissions": [
     "storage",
@@ -17,6 +17,7 @@
     "https://internshala.com/*",
     "https://wellfound.com/*",
     "https://indeed.com/*",
+    "https://naukri.com/*",
     "https://www.linkedin.com/jobs/*"
   ],
 
@@ -31,7 +32,8 @@
         "https://internshala.com/jobs*",
         "https://wellfound.com/jobs*",
         "https://wellfound.com/role/*",
-        "https://indeed.com/jobs*"
+        "https://indeed.com/jobs*",
+        "https://naukri.com/*"
       ],
       "js": ["content.js"],
       "run_at": "document_end"
@@ -39,7 +41,7 @@
     {
       "matches": [
         "http://localhost:3000/*",
-        "http://localhost:3000/autofill*"
+        "http://127.0.0.1:3000/*"
       ],
       "js": ["web-bridge.js"],
       "run_at": "document_start"
@@ -49,5 +51,12 @@
   "action": {
     "default_popup": "popup.html",
     "default_title": "AutoApply"
-  }
+  },
+
+  "web_accessible_resources": [
+    {
+      "resources": ["web-bridge.js"],
+      "matches": ["http://localhost:3000/*"]
+    }
+  ]
 }

@@ -1,78 +1,95 @@
 /**
  * content.js - Autofill logic for job application sites
- * Runs on LinkedIn, Internshala, Wellfound, Indeed
+ * Fills forms with position and resume data received from extension
  */
 
-let autofillData = null;
+let currentApplication = null;
 
-// Load autofill data on page load
-chrome.storage.local.get(['autofillData'], (result) => {
-  autofillData = result.autofillData;
-  console.log('[ContentScript] Loaded autofill data:', autofillData);
-  
-  // Try to autofill on page load
-  if (autofillData) {
-    setTimeout(() => detectAndAutofill(), 1000);
-  }
-});
-
-// Listen for data updates from background
+// Listen for start autofill message from background
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.type === 'AUTOFILL_DATA_UPDATED') {
-    autofillData = request.payload;
-    console.log('[ContentScript] Data updated:', autofillData);
-    detectAndAutofill();
+  if (request.type === 'START_AUTOFILL') {
+    currentApplication = request.payload;
+    console.log('[ContentScript] Received autofill request on URL:', window.location.href);
+    console.log('[ContentScript] Application data:', currentApplication);
+    
+    // Wait a moment for page to load if needed, then detect and autofill
+    setTimeout(() => detectAndAutofill(), 1000);
     sendResponse({ success: true });
-  }
-
-  if (request.type === 'DATA_CLEARED') {
-    autofillData = null;
-    console.log('[ContentScript] Data cleared');
-    sendResponse({ success: true });
+  } else {
+    console.log('[ContentScript] Unknown message type:', request.type);
   }
 });
 
 // Main autofill detection and execution
 async function detectAndAutofill() {
+  if (!currentApplication) return;
+
   const url = window.location.href;
   console.log('[ContentScript] Checking URL:', url);
 
-  if (url.includes('linkedin.com/jobs') || url.includes('linkedin.com/jobs/')) {
+  if (url.includes('linkedin.com')) {
     console.log('[ContentScript] Detected LinkedIn job page');
     autofillLinkedIn();
-  } else if (url.includes('internshala.com/jobs')) {
-    console.log('[ContentScript] Detected Internshala job page');
-    autofillInternshala();
-  } else if (url.includes('wellfound.com/jobs') || url.includes('wellfound.com/role/')) {
-    console.log('[ContentScript] Detected Wellfound job page');
-    autofillWellfound();
-  } else if (url.includes('indeed.com/jobs')) {
+  } else if (url.includes('indeed.com')) {
     console.log('[ContentScript] Detected Indeed job page');
     autofillIndeed();
+  } else if (url.includes('internshala.com')) {
+    console.log('[ContentScript] Detected Intershala job page');
+    autofillIntershala();
+  } else if (url.includes('wellfound.com')) {
+    console.log('[ContentScript] Detected Wellfound job page');
+    autofillWellfound();
+  } else if (url.includes('naukri.com')) {
+    console.log('[ContentScript] Detected Naukri job page');
+    autofillNaukri();
   }
+}
+
+/**
+ * Extract user info from resume text using basic regex
+ */
+function extractFromResume(resume) {
+  const emailMatch = resume.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/);
+  const phoneMatch = resume.match(/(\+\d{1,3}[-.\s]?\d{1,14}|[0-9]{10})/);
+  const nameMatch = resume.match(/^([A-Z][a-z]+(?:\s[A-Z][a-z]+)?)/m);
+
+  return {
+    email: emailMatch ? emailMatch[1] : '',
+    phone: phoneMatch ? phoneMatch[1] : '',
+    name: nameMatch ? nameMatch[1] : '',
+  };
 }
 
 /**
  * LinkedIn Autofill
  */
 function autofillLinkedIn() {
-  if (!autofillData) return;
-
-  console.log('[LinkedIn] Starting autofill...');
-
-  // Look for application form modal
-  const modals = document.querySelectorAll('[role="dialog"], .modal, [class*="modal"], [class*="form"]');
-  console.log('[LinkedIn] Found', modals.length, 'potential form containers');
+  const userInfo = extractFromResume(currentApplication.resume);
+  console.log('[LinkedIn] Starting autofill with position:', currentApplication.position);
 
   let fieldsFound = 0;
 
-  // Name field
+  // Fill position-related fields
+  const positionInputs = document.querySelectorAll(
+    'input[aria-label*="desired job title" i], input[placeholder*="job title" i], input[name*="position" i]'
+  );
+  positionInputs.forEach((input) => {
+    if (!input.value && currentApplication.position) {
+      input.value = currentApplication.position;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      fieldsFound++;
+      console.log('[LinkedIn] ✓ Filled position');
+    }
+  });
+
+  // Fill name fields
   const nameInputs = document.querySelectorAll(
-    'input[name*="name" i], input[aria-label*="name" i], input[placeholder*="name" i]'
+    'input[name*="name" i], input[aria-label*="first name" i], input[placeholder*="name" i]'
   );
   nameInputs.forEach((input) => {
-    if (!input.value && autofillData.name) {
-      input.value = autofillData.name;
+    if (!input.value && userInfo.name) {
+      input.value = userInfo.name;
       input.dispatchEvent(new Event('input', { bubbles: true }));
       input.dispatchEvent(new Event('change', { bubbles: true }));
       fieldsFound++;
@@ -80,13 +97,13 @@ function autofillLinkedIn() {
     }
   });
 
-  // Email field
+  // Fill email
   const emailInputs = document.querySelectorAll(
     'input[type="email"], input[name*="email" i], input[aria-label*="email" i]'
   );
   emailInputs.forEach((input) => {
-    if (!input.value && autofillData.email) {
-      input.value = autofillData.email;
+    if (!input.value && userInfo.email) {
+      input.value = userInfo.email;
       input.dispatchEvent(new Event('input', { bubbles: true }));
       input.dispatchEvent(new Event('change', { bubbles: true }));
       fieldsFound++;
@@ -94,13 +111,13 @@ function autofillLinkedIn() {
     }
   });
 
-  // Phone field
+  // Fill phone
   const phoneInputs = document.querySelectorAll(
-    'input[type="tel"], input[type="phone"], input[name*="phone" i], input[aria-label*="phone" i]'
+    'input[type="tel"], input[name*="phone" i], input[aria-label*="phone" i]'
   );
   phoneInputs.forEach((input) => {
-    if (!input.value && autofillData.phone) {
-      input.value = autofillData.phone;
+    if (!input.value && userInfo.phone) {
+      input.value = userInfo.phone;
       input.dispatchEvent(new Event('input', { bubbles: true }));
       input.dispatchEvent(new Event('change', { bubbles: true }));
       fieldsFound++;
@@ -112,109 +129,80 @@ function autofillLinkedIn() {
 }
 
 /**
- * Internshala Autofill
+ * Indeed Autofill
  */
-function autofillInternshala() {
-  if (!autofillData) return;
+function autofillIndeed() {
+  const userInfo = extractFromResume(currentApplication.resume);
+  console.log('[Indeed] Starting autofill with position:', currentApplication.position);
 
-  console.log('[Internshala] Starting autofill...');
   let fieldsFound = 0;
 
-  // Internshala uses different field structure
-  // Name
-  const nameInput = document.querySelector(
-    'input[name="full_name"], input[placeholder="Full Name"], input[id*="name"]'
+  // Fill position
+  const positionInputs = document.querySelectorAll(
+    'input[aria-label*="job title" i], input[placeholder*="job title" i]'
   );
-  if (nameInput && autofillData.name) {
-    nameInput.value = autofillData.name;
-    nameInput.dispatchEvent(new Event('change', { bubbles: true }));
-    fieldsFound++;
-    console.log('[Internshala] ✓ Filled name');
-  }
-
-  // Email
-  const emailInput = document.querySelector(
-    'input[name="email"], input[type="email"], input[placeholder="Email"]'
-  );
-  if (emailInput && autofillData.email) {
-    emailInput.value = autofillData.email;
-    emailInput.dispatchEvent(new Event('change', { bubbles: true }));
-    fieldsFound++;
-    console.log('[Internshala] ✓ Filled email');
-  }
-
-  // Phone
-  const phoneInput = document.querySelector(
-    'input[name="phone"], input[type="tel"], input[placeholder*="Phone"]'
-  );
-  if (phoneInput && autofillData.phone) {
-    phoneInput.value = autofillData.phone;
-    phoneInput.dispatchEvent(new Event('change', { bubbles: true }));
-    fieldsFound++;
-    console.log('[Internshala] ✓ Filled phone');
-  }
-
-  // Auto-click apply button
-  setTimeout(() => {
-    const applyBtn = document.querySelector(
-      'button[text*="Apply"], button[class*="apply"], button:contains("Apply")'
-    );
-    if (applyBtn && fieldsFound > 0) {
-      console.log('[Internshala] Auto-clicking apply button');
-      applyBtn.click();
+  positionInputs.forEach((input) => {
+    if (!input.value) {
+      input.value = currentApplication.position;
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      fieldsFound++;
+      console.log('[Indeed] ✓ Filled position');
     }
-  }, 500);
+  });
 
-  console.log('[Internshala] Autofill complete. Fields filled:', fieldsFound);
+  // Fill other fields
+  const inputs = document.querySelectorAll('input[type="text"], input[type="email"]');
+  inputs.forEach((input) => {
+    const label = input.getAttribute('aria-label')?.toLowerCase() || '';
+    const name = input.getAttribute('name')?.toLowerCase() || '';
+
+    if (!input.value) {
+      if ((label.includes('name') || name.includes('name')) && userInfo.name) {
+        input.value = userInfo.name;
+        fieldsFound++;
+      } else if ((label.includes('email') || name.includes('email')) && userInfo.email) {
+        input.value = userInfo.email;
+        fieldsFound++;
+      } else if ((label.includes('phone') || name.includes('phone')) && userInfo.phone) {
+        input.value = userInfo.phone;
+        fieldsFound++;
+      }
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  });
+
+  console.log('[Indeed] Autofill complete. Fields filled:', fieldsFound);
 }
 
 /**
  * Wellfound Autofill
  */
 function autofillWellfound() {
-  if (!autofillData) return;
+  const userInfo = extractFromResume(currentApplication.resume);
+  console.log('[Wellfound] Starting autofill');
 
-  console.log('[Wellfound] Starting autofill...');
   let fieldsFound = 0;
-
-  // Wellfound form fields
-  const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"]');
+  const inputs = document.querySelectorAll('input[type="text"], input[type="email"], textarea');
 
   inputs.forEach((input) => {
-    const placeholder = input.placeholder.toLowerCase();
-    const label = input.getAttribute('aria-label')?.toLowerCase() || '';
+    if (!input.value) {
+      const placeholder = input.placeholder?.toLowerCase() || '';
+      const label = input.getAttribute('aria-label')?.toLowerCase() || '';
 
-    // Name
-    if ((placeholder.includes('name') || label.includes('name')) && autofillData.name) {
-      if (!input.value) {
-        input.value = autofillData.name;
-        input.dispatchEvent(new Event('input', { bubbles: true }));
-        input.dispatchEvent(new Event('change', { bubbles: true }));
+      if ((placeholder.includes('position') || label.includes('position')) && currentApplication.position) {
+        input.value = currentApplication.position;
         fieldsFound++;
-        console.log('[Wellfound] ✓ Filled name');
-      }
-    }
-
-    // Email
-    if ((placeholder.includes('email') || label.includes('email')) && autofillData.email) {
-      if (!input.value) {
-        input.value = autofillData.email;
-        input.dispatchEvent(new Event('input', { bubbles: true }));
-        input.dispatchEvent(new Event('change', { bubbles: true }));
+      } else if ((placeholder.includes('name') || label.includes('name')) && userInfo.name) {
+        input.value = userInfo.name;
         fieldsFound++;
-        console.log('[Wellfound] ✓ Filled email');
-      }
-    }
-
-    // Phone
-    if ((placeholder.includes('phone') || label.includes('phone')) && autofillData.phone) {
-      if (!input.value) {
-        input.value = autofillData.phone;
-        input.dispatchEvent(new Event('input', { bubbles: true }));
-        input.dispatchEvent(new Event('change', { bubbles: true }));
+      } else if ((placeholder.includes('email') || label.includes('email')) && userInfo.email) {
+        input.value = userInfo.email;
         fieldsFound++;
-        console.log('[Wellfound] ✓ Filled phone');
+      } else if ((placeholder.includes('phone') || label.includes('phone')) && userInfo.phone) {
+        input.value = userInfo.phone;
+        fieldsFound++;
       }
+      input.dispatchEvent(new Event('change', { bubbles: true }));
     }
   });
 
@@ -222,61 +210,95 @@ function autofillWellfound() {
 }
 
 /**
- * Indeed Autofill
+ * Intershala Autofill
  */
-function autofillIndeed() {
-  if (!autofillData) return;
+function autofillIntershala() {
+  const userInfo = extractFromResume(currentApplication.resume);
+  console.log('[Intershala] Starting autofill');
 
-  console.log('[Indeed] Starting autofill...');
   let fieldsFound = 0;
 
-  // Indeed form fields
-  const inputs = document.querySelectorAll(
-    'input[class*="application"], input[type="text"], input[type="email"]'
-  );
+  // Internshala uses specific field structures
+  const inputs = document.querySelectorAll('input[type="text"], input[type="email"], textarea');
 
   inputs.forEach((input) => {
     if (!input.value) {
       const name = input.name?.toLowerCase() || '';
       const id = input.id?.toLowerCase() || '';
+      const placeholder = input.placeholder?.toLowerCase() || '';
 
-      // Name
-      if ((name.includes('name') || id.includes('name')) && autofillData.name) {
-        input.value = autofillData.name;
-        input.dispatchEvent(new Event('change', { bubbles: true }));
+      if ((name.includes('position') || name.includes('job_title')) && currentApplication.position) {
+        input.value = currentApplication.position;
         fieldsFound++;
-        console.log('[Indeed] ✓ Filled name');
-      }
-
-      // Email
-      if ((name.includes('email') || id.includes('email')) && autofillData.email) {
-        input.value = autofillData.email;
-        input.dispatchEvent(new Event('change', { bubbles: true }));
+      } else if ((name.includes('name') || id.includes('name')) && userInfo.name) {
+        input.value = userInfo.name;
         fieldsFound++;
-        console.log('[Indeed] ✓ Filled email');
-      }
-
-      // Phone
-      if ((name.includes('phone') || id.includes('phone')) && autofillData.phone) {
-        input.value = autofillData.phone;
-        input.dispatchEvent(new Event('change', { bubbles: true }));
+      } else if ((name.includes('email') || input.type === 'email') && userInfo.email) {
+        input.value = userInfo.email;
         fieldsFound++;
-        console.log('[Indeed] ✓ Filled phone');
+      } else if ((name.includes('phone') || placeholder.includes('phone')) && userInfo.phone) {
+        input.value = userInfo.phone;
+        fieldsFound++;
       }
+      input.dispatchEvent(new Event('change', { bubbles: true }));
     }
   });
 
-  console.log('[Indeed] Autofill complete. Fields filled:', fieldsFound);
+  // Auto-click apply button if found
+  setTimeout(() => {
+    const applyBtn = document.querySelector('button[class*="apply"], button:contains("Apply")');
+    if (applyBtn && fieldsFound > 0) {
+      console.log('[Intershala] Found apply button, ready to click');
+    }
+  }, 500);
+
+  console.log('[Intershala] Autofill complete. Fields filled:', fieldsFound);
+}
+
+/**
+ * Naukri Autofill
+ */
+function autofillNaukri() {
+  const userInfo = extractFromResume(currentApplication.resume);
+  console.log('[Naukri] Starting autofill');
+
+  let fieldsFound = 0;
+  const inputs = document.querySelectorAll('input[type="text"], input[type="email"], textarea');
+
+  inputs.forEach((input) => {
+    if (!input.value) {
+      const name = input.name?.toLowerCase() || '';
+      const id = input.id?.toLowerCase() || '';
+      const placeholder = input.placeholder?.toLowerCase() || '';
+      const label = input.getAttribute('aria-label')?.toLowerCase() || '';
+
+      if ((name.includes('position') || placeholder.includes('position') || label.includes('position')) && currentApplication.position) {
+        input.value = currentApplication.position;
+        fieldsFound++;
+      } else if ((name.includes('name') || id.includes('name') || placeholder.includes('name')) && userInfo.name) {
+        input.value = userInfo.name;
+        fieldsFound++;
+      } else if ((input.type === 'email' || name.includes('email')) && userInfo.email) {
+        input.value = userInfo.email;
+        fieldsFound++;
+      } else if ((name.includes('phone') || placeholder.includes('phone')) && userInfo.phone) {
+        input.value = userInfo.phone;
+        fieldsFound++;
+      }
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  });
+
+  console.log('[Naukri] Autofill complete. Fields filled:', fieldsFound);
 }
 
 console.log('[ContentScript] Loaded on:', window.location.href);
 
 // Monitor for dynamic content (forms loaded after page load)
 const observer = new MutationObserver(() => {
-  // Debounce autofill attempts
   clearTimeout(observer.timeout);
   observer.timeout = setTimeout(() => {
-    if (autofillData) {
+    if (currentApplication) {
       detectAndAutofill();
     }
   }, 500);
@@ -286,3 +308,4 @@ observer.observe(document.body, {
   childList: true,
   subtree: true,
 });
+

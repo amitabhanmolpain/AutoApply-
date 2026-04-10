@@ -3,65 +3,76 @@
 import { useState } from 'react';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
-import { Upload, CheckCircle2, Zap } from 'lucide-react';
+import { Upload, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Setup() {
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [jobTitle, setJobTitle] = useState('');
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
-  const [isApplying, setIsApplying] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const platforms = [
     { id: 'linkedin', name: 'LinkedIn', logo: 'https://cdn-icons-png.flaticon.com/512/3536/3536505.png', color: 'from-blue-600 to-blue-700' },
     { id: 'intershala', name: 'Intershala', logo: 'https://cdn.aptoide.com/imgs/c/3/1/c31c5e531ad94d917080d17066c31470_icon.png', color: 'from-blue-500 to-cyan-600' },
-    { id: 'wellfound', name: 'Wellfound', logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_uvmLprvNSpkN84gOZSYVaGS6iyuiINTGdw&s', color: 'from-orange-500 to-red-600' },
+    { id: 'wellfound', name: 'Wellfound', logo: 'https://logo.clearbit.com/wellfound.com', color: 'from-orange-500 to-red-600' },
     { id: 'indeed', name: 'Indeed', logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThz8Qi-G6jIHt6TmCOguWjOKGYYQPB1afpSQ&s', color: 'from-blue-600 to-purple-700' },
     { id: 'naukri', name: 'Naukri.com', logo: 'https://static.naukimg.com/s/0/0/i/new-logos/naukri.png', color: 'from-blue-600 to-blue-700' },
   ];
 
-  const handleResumeUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleResumeUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.type === 'application/pdf' || file.type === 'application/msword') {
+      const allowedMimeTypes = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'text/plain',
+      ];
+      const allowedExtensions = ['.pdf', '.doc', '.docx', '.txt'];
+      const lowerName = file.name.toLowerCase();
+      const hasAllowedExtension = allowedExtensions.some((ext) => lowerName.endsWith(ext));
+      const isAllowedType = allowedMimeTypes.includes(file.type) || hasAllowedExtension;
+
+      if (isAllowedType) {
         setResumeFile(file);
-        toast.success(`Resume uploaded: ${file.name}`);
+        toast.success(`Resume selected: ${file.name}`);
+        
+        // Auto-save resume to database
+        try {
+          const resumeText = await file.text();
+          setIsSaving(true);
+          const response = await fetch('http://localhost:5000/api/profile/resume', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              resume_text: resumeText,
+              filename: file.name,
+            }),
+          });
+          
+          if (response.ok) {
+            toast.success('Resume saved to profile');
+          } else {
+            toast.error('Failed to save resume');
+          }
+        } catch (error) {
+          console.error('Error saving resume:', error);
+          toast.error('Error saving resume');
+        } finally {
+          setIsSaving(false);
+        }
       } else {
-        toast.error('Please upload a PDF or DOC file');
+        toast.error('Please upload a PDF, DOC, DOCX, or TXT file');
       }
     }
   };
 
-  const togglePlatform = (platformId: string) => {
-    setSelectedPlatforms((prev) =>
-      prev.includes(platformId)
-        ? prev.filter((p) => p !== platformId)
-        : [...prev, platformId]
-    );
-  };
-
-  const handleAutoApply = async () => {
-    if (!resumeFile) {
-      toast.error('Please upload your resume');
-      return;
-    }
-    if (!jobTitle.trim()) {
-      toast.error('Please enter a job title');
-      return;
-    }
-    if (selectedPlatforms.length === 0) {
-      toast.error('Please select at least one platform');
-      return;
-    }
-
-    setIsApplying(true);
-    toast.loading('Starting auto-apply process...');
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    toast.success(`Successfully applied to ${Math.floor(Math.random() * 20) + 5} jobs!`);
-    setIsApplying(false);
+  const togglePlatform = async (platformId: string) => {
+    const updated = selectedPlatforms.includes(platformId)
+      ? selectedPlatforms.filter((p) => p !== platformId)
+      : [...selectedPlatforms, platformId];
+    setSelectedPlatforms(updated);
   };
 
   return (
@@ -76,7 +87,7 @@ export default function Setup() {
               <span className="gradient-text">Setup Your Profile</span>
             </h1>
             <p className="text-xl text-gray-300">
-              Let&apos;s configure your job preferences and start automating applications
+              Upload your resume and configure your job search preferences. You can then apply to jobs from the Applications section.
             </p>
           </div>
 
@@ -168,21 +179,19 @@ export default function Setup() {
 
               {/* CTA Button */}
               <button
-                onClick={handleAutoApply}
-                disabled={isApplying}
-                className="w-full gradient-button px-8 py-4 text-lg inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={() => window.location.href = '/applications'}
+                className="w-full gradient-button px-8 py-4 text-lg inline-flex items-center justify-center gap-2 hover:scale-105 transition-transform"
               >
-                <Zap className="w-5 h-5" />
-                {isApplying ? 'Applying to Jobs...' : 'Start Auto Apply'}
+                Go to Applications
               </button>
 
               {/* Info Box */}
               <div className="relative overflow-hidden rounded-xl p-6 border border-cyan-500/30">
                 <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10"></div>
                 <div className="relative z-10 flex items-start gap-4">
-                  <Zap className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-1" />
+                  <CheckCircle2 className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-1" />
                   <p className="text-gray-200 text-sm">
-                    <strong className="text-cyan-300">Auto Apply Magic:</strong> AutoApply analyzes your resume and applies to matching opportunities across all selected platforms. Track your progress and get notified for interviews in the Analytics dashboard.
+                    <strong className="text-cyan-300">Next Step:</strong> Once your profile is set up, go to the Applications section to select job portals and start auto-applying to opportunities.
                   </p>
                 </div>
               </div>

@@ -73,3 +73,81 @@ def delete_application(app_id):
             return jsonify({'error': 'Application not found'}), 404
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+# ==================== BATCH APPLICATIONS ====================
+
+@applications_bp.route('/batch/start', methods=['POST'])
+def start_batch_apply():
+    """Start a batch of applications"""
+    data = request.get_json()
+    
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+    
+    try:
+        result = ApplicationController.start_batch_apply(data)
+        
+        if not result.get('success'):
+            return jsonify(result), 400
+        
+        return jsonify(result), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@applications_bp.route('/batch/<batch_id>', methods=['GET'])
+def get_batch(batch_id):
+    """Get batch status"""
+    try:
+        batch = ApplicationController.get_batch(batch_id)
+        
+        if not batch:
+            return jsonify({'error': 'Batch not found'}), 404
+        
+        return jsonify(batch), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@applications_bp.route('/batch', methods=['GET'])
+def get_all_batches():
+    """Get all application batches"""
+    try:
+        batches = ApplicationController.get_all_batches()
+        return jsonify({'batches': batches, 'total': len(batches)}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@applications_bp.route('/batch/<batch_id>', methods=['PUT'])
+def update_batch(batch_id):
+    """Update batch status"""
+    data = request.get_json()
+    
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+    
+    try:
+        status = data.get('status')
+        started_at = data.get('started_at')
+        completed_at = data.get('completed_at')
+        
+        if status:
+            batch = ApplicationController.update_batch_status(
+                batch_id, status, started_at, completed_at
+            )
+        else:
+            # Update application counts
+            completed = data.get('completed_applications', 0)
+            failed = data.get('failed_applications', 0)
+            batch = ApplicationController.update_batch_application_count(
+                batch_id, completed, failed
+            )
+        
+        if not batch:
+            return jsonify({'error': 'Batch not found'}), 404
+        
+        return jsonify(batch), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

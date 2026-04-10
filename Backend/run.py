@@ -2,6 +2,7 @@ from flask import Flask
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
+from db import connect_db, close_db
 
 # Load environment variables
 load_dotenv()
@@ -13,12 +14,16 @@ app.config['JSON_SORT_KEYS'] = False
 # Enable CORS
 CORS(app)
 
+# Connect to MongoDB
+connect_db()
+
 # Import routes
 from routes.applications import applications_bp
 from routes.dashboard import dashboard_bp
 from routes.settings import settings_bp
 from routes.analytics import analytics_bp
 from routes.setup import setup_bp
+from routes.profile import profile_bp
 
 # Register blueprints
 app.register_blueprint(applications_bp)
@@ -26,6 +31,7 @@ app.register_blueprint(dashboard_bp)
 app.register_blueprint(settings_bp)
 app.register_blueprint(analytics_bp)
 app.register_blueprint(setup_bp)
+app.register_blueprint(profile_bp)
 
 # Health check endpoint
 @app.route('/health', methods=['GET'])

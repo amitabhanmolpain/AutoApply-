@@ -3,44 +3,48 @@
  * Bridges communication between web app and extension
  */
 
+// Check if chrome extension API is available
+if (!window.chrome || !window.chrome.runtime) {
+  console.warn('[WebBridge] Chrome extension API not available');
+}
+
 window.addEventListener('message', (event) => {
   // Only accept messages from same origin
   if (event.origin !== window.location.origin) return;
 
   const { type, payload } = event.data;
 
-  // Handle autofill data updates from web app
-  if (type === 'AUTOFILL_DATA_UPDATED') {
-    console.log('[WebBridge] Received autofill data:', payload);
+  // Handle apply position request
+  if (type === 'APPLY_POSITION') {
+    console.log('[WebBridge] Received apply position request:', payload);
+    
+    if (!window.chrome || !window.chrome.runtime) {
+      console.error('[WebBridge] Chrome extension API not available - extension may not be installed');
+      return;
+    }
     
     // Send to extension
-    chrome.runtime.sendMessage(
-      {
-        type: 'SAVE_AUTOFILL_DATA',
-        payload: payload,
-      },
-      (response) => {
-        if (chrome.runtime.lastError) {
-          console.log('[WebBridge] Extension not installed');
-          return;
+    try {
+      chrome.runtime.sendMessage(
+        {
+          type: 'APPLY_POSITION',
+          payload: payload,
+        },
+        (response) => {
+          if (chrome.runtime.lastError) {
+            console.error('[WebBridge] Extension error:', chrome.runtime.lastError);
+            return;
+          }
+          console.log('[WebBridge] Apply request sent to extension:', response);
         }
-        console.log('[WebBridge] Data sent to extension:', response);
-      }
-    );
-  }
-
-  // Handle clear data
-  if (type === 'AUTOFILL_DATA_CLEARED') {
-    console.log('[WebBridge] Clearing data');
-    chrome.runtime.sendMessage({ type: 'CLEAR_AUTOFILL_DATA' });
-  }
-
-  // Test message from extension check
-  if (type === 'TEST_EXTENSION') {
-    console.log('[WebBridge] Extension test received');
+      );
+    } catch (error) {
+      console.error('[WebBridge] Failed to send message to extension:', error);
+    }
   }
 });
 
 // Notify web app that extension is ready
 window.postMessage({ type: 'EXTENSION_READY' }, '*');
-console.log('[WebBridge] Loaded on web app');
+console.log('[WebBridge] Loaded and listening for messages');
+

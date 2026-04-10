@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { Menu, X, Rocket } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,11 +12,9 @@ export function Navbar() {
 
   const navItems = [
     { href: '/', label: 'Home' },
-    { href: '/dashboard', label: 'Dashboard' },
     { href: '/setup', label: 'Setup' },
-    { href: '/autofill', label: 'Autofill' },
-    { href: '/analytics', label: 'Analytics' },
     { href: '/applications', label: 'Applications' },
+    { href: '/analytics', label: 'Analytics' },
     { href: '/settings', label: 'Settings' },
   ];
 
@@ -41,9 +39,14 @@ export function Navbar() {
         <div className="max-w-7xl mx-auto flex justify-between items-center h-auto">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group flex-shrink-0">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 via-blue-600 to-cyan-500 rounded-xl flex items-center justify-center neon-glow-blue group-hover:scale-110 transition-transform duration-300">
-              <Rocket className="w-6 h-6 text-white" />
-            </div>
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/3050/3050159.png"
+              alt="AutoApply"
+              className="w-10 h-10 rounded-xl neon-glow-blue group-hover:scale-110 transition-transform duration-300"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2359d0fa"%3E%3Cpath d="M12 1l9.5 5.5v11L12 23l-9.5-5.5v-11L12 1m0 2.18l-7.5 4.33v8.98l7.5 4.33 7.5-4.33V7.51L12 3.18z"/%3E%3C/svg%3E';
+              }}
+            />
             <div className={`hidden sm:flex flex-col transition-all duration-500 ${isScrolled ? 'scale-90' : 'scale-100'}`}>
               <span className="font-bold text-lg bg-gradient-to-r from-blue-400 via-blue-500 to-cyan-400 bg-clip-text text-transparent">AutoApply</span>
               <span className="text-xs text-cyan-300/70">Job Automation</span>
@@ -69,7 +72,7 @@ export function Navbar() {
 
           {/* CTA Button */}
           <div className="hidden md:block">
-            <Link href="/dashboard" className="gradient-button px-6 py-2 text-sm whitespace-nowrap">
+            <Link href="/setup" className="gradient-button px-6 py-2 text-sm whitespace-nowrap">
               Get Started
             </Link>
           </div>
