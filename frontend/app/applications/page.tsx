@@ -49,6 +49,7 @@ export default function Applications() {
   const [selectedPosition, setSelectedPosition] = useState('');
   const [resumeText, setResumeText] = useState('');
   const [resumeFileName, setResumeFileName] = useState('');
+  const [parsedProfile, setParsedProfile] = useState<Record<string, unknown> | null>(null);
   const [selectedPortals, setSelectedPortals] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -89,6 +90,16 @@ export default function Applications() {
           if (profile.resume_text) {
             setResumeText(profile.resume_text);
             setResumeFileName(profile.resume_filename || 'Resume uploaded');
+
+            try {
+              const parsedResponse = await fetch('http://localhost:5000/api/profile/parsed');
+              if (parsedResponse.ok) {
+                const parsedData = await parsedResponse.json();
+                setParsedProfile(parsedData.parsed_profile || null);
+              }
+            } catch (parseError) {
+              console.warn('[Applications] Could not load parsed profile:', parseError);
+            }
           }
           console.log('[Applications] Loaded profile:', profile);
         }
@@ -127,10 +138,25 @@ export default function Applications() {
       }
 
       // Prepare data to send to extension
+      let latestParsedProfile = parsedProfile;
+      if (!latestParsedProfile) {
+        try {
+          const parsedResponse = await fetch('http://localhost:5000/api/profile/parsed');
+          if (parsedResponse.ok) {
+            const parsedData = await parsedResponse.json();
+            latestParsedProfile = parsedData.parsed_profile || null;
+            setParsedProfile(latestParsedProfile);
+          }
+        } catch (parseError) {
+          console.warn('[Applications] Could not parse resume before apply:', parseError);
+        }
+      }
+
       const applicationData = {
         position: selectedPosition,
         resume: resumeText,
         fileName: resumeFileName,
+        parsed_profile: latestParsedProfile,
         websites: selectedPortals,
         timestamp: new Date().toISOString(),
       };

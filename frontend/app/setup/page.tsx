@@ -40,21 +40,33 @@ export default function Setup() {
         
         // Auto-save resume to database
         try {
-          const resumeText = await file.text();
           setIsSaving(true);
-          const response = await fetch('http://localhost:5000/api/profile/resume', {
+          const formData = new FormData();
+          formData.append('resume', file);
+
+          const response = await fetch('http://localhost:5000/api/profile/resume/upload', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              resume_text: resumeText,
-              filename: file.name,
-            }),
+            body: formData,
           });
           
           if (response.ok) {
+            const uploadResult = await response.json();
             toast.success('Resume saved to profile');
+            window.postMessage(
+              {
+                type: 'SYNC_PARSED_PROFILE',
+                payload: {
+                  parsed_profile: uploadResult.parsed_profile || null,
+                  fileName: file.name,
+                  timestamp: new Date().toISOString(),
+                },
+              },
+              '*'
+            );
+            toast.success('Extracted fields synced to extension');
           } else {
-            toast.error('Failed to save resume');
+            const errorData = await response.json().catch(() => ({}));
+            toast.error(errorData.error || 'Failed to save resume');
           }
         } catch (error) {
           console.error('Error saving resume:', error);

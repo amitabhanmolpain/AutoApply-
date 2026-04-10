@@ -14,6 +14,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       position: request.payload.position,
       resume: request.payload.resume,
       fileName: request.payload.fileName,
+      parsed_profile: request.payload.parsed_profile || null,
       websites: request.payload.websites,
       timestamp: request.payload.timestamp,
       status: 'pending', // pending / completed / failed
@@ -77,6 +78,36 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     chrome.storage.local.get(['currentApplication'], (result) => {
       sendResponse({ data: result.currentApplication || null });
     });
+    return true;
+  }
+
+  if (request.type === 'SYNC_PARSED_PROFILE') {
+    const parsedPayload = {
+      parsed_profile: request.payload?.parsed_profile || null,
+      fileName: request.payload?.fileName || null,
+      timestamp: request.payload?.timestamp || new Date().toISOString(),
+    };
+
+    chrome.storage.local.get(['currentApplication'], (result) => {
+      const currentApplication = result.currentApplication || null;
+      const mergedApplication = currentApplication
+        ? {
+            ...currentApplication,
+            parsed_profile: parsedPayload.parsed_profile,
+            fileName: parsedPayload.fileName || currentApplication.fileName,
+          }
+        : null;
+
+      const toStore = { currentProfile: parsedPayload };
+      if (mergedApplication) {
+        toStore.currentApplication = mergedApplication;
+      }
+
+      chrome.storage.local.set(toStore, () => {
+        sendResponse({ success: true, message: 'Parsed profile synced' });
+      });
+    });
+
     return true;
   }
 });

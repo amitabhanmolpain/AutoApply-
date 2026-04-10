@@ -28,6 +28,35 @@ cp .env.example .env
 # Edit .env and add your Gemini API key
 ```
 
+### LLM/AI Configuration
+
+The backend now supports provider-based LLM configuration for agent workflows.
+
+Set these in `.env`:
+
+```bash
+LLM_ENABLED=true
+LLM_PROVIDER=gemini   # gemini | openai | anthropic
+GEMINI_API_KEY=...
+OPENAI_API_KEY=...
+ANTHROPIC_API_KEY=...
+LLM_MODEL_GENERAL=gemini-1.5-flash
+LLM_MODEL_RESUME_PARSER=gemini-1.5-flash
+LLM_MODEL_COVER_LETTER=gemini-1.5-pro
+GOOGLE_APPLICATION_CREDENTIALS=C:/path/to/your-service-account.json
+```
+
+AI-required features in the agent:
+- Resume parsing/enrichment
+- Cover letter personalization
+- Application reasoning/ranking refinement
+
+Implementation files:
+- `Backend/config/llm_config.py`
+- `Backend/agent/orchestrator.py`
+
+If `LLM_ENABLED=false`, agent flow still runs with non-LLM fallbacks.
+
 ## Running the Application
 
 Start the Flask server:
@@ -159,6 +188,15 @@ Backend/
 - **pdfplumber** - PDF text extraction
 - **python-docx** - DOCX parsing
 - **google-generativeai** - Gemini AI integration
+
+## Security Notes
+
+Sensitive files are ignored by git at repository root:
+- `Backend/.env`
+- `Backend/policyagent-*.json`
+- service-account credential files
+
+Do not commit API keys or service-account JSON files.
 
 ## Development
 

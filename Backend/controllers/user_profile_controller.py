@@ -2,6 +2,8 @@
 from db import get_collection
 from datetime import datetime
 from bson import ObjectId
+from parsers.resume_parser import ResumeParser
+from agent.resume_agent import ResumeProfileAgent
 
 
 class UserProfileController:
@@ -97,6 +99,53 @@ class UserProfileController:
             'resume_size': len(resume_text),
             'modified_count': result.modified_count or result.upserted_id is not None
         }
+
+    @staticmethod
+    def upload_resume_file(file_bytes, filename):
+        """Upload and parse resume file (PDF/DOCX/TXT), then persist parsed profile."""
+        collection = get_collection('user_profiles')
+        if collection is None:
+            return {'error': 'Database connection failed'}
+
+        if not file_bytes:
+            return {'error': 'Empty file uploaded'}
+
+        lower_name = (filename or '').lower()
+        parser_agent = ResumeProfileAgent()
+
+        try:
+            if lower_name.endswith('.txt'):
+                resume_text = file_bytes.decode('utf-8', errors='ignore')
+            else:
+                parser = ResumeParser()
+                parsed_resume = parser.parse(filename, file_bytes=file_bytes)
+                resume_text = parsed_resume.raw_text
+
+            parsed_profile = parser_agent.parse_resume_text(resume_text)
+        except Exception as e:
+            return {'error': f'Could not parse resume file: {e}'}
+
+        result = collection.update_one(
+            {'_id': 'default_user'},
+            {
+                '$set': {
+                    'resume_text': resume_text,
+                    'resume_filename': filename,
+                    'parsed_profile': parsed_profile,
+                    'resume_uploaded_at': datetime.utcnow(),
+                    'updated_at': datetime.utcnow(),
+                }
+            },
+            upsert=True
+        )
+
+        return {
+            'success': True,
+            'filename': filename,
+            'resume_size': len(resume_text),
+            'parsed_profile': parsed_profile,
+            'modified_count': result.modified_count or result.upserted_id is not None,
+        }
     
     @staticmethod
     def get_profile():
@@ -129,6 +178,45 @@ class UserProfileController:
         
         profile = collection.find_one({'_id': 'default_user'})
         return profile.get('resume_text') if profile else None
+
+    @staticmethod
+    def get_parsed_resume_profile():
+        """Parse stored resume text into structured fields for extension autofill."""
+        collection = get_collection('user_profiles')
+        if collection is None:
+            return {'error': 'Database connection failed'}
+
+        profile = collection.find_one({'_id': 'default_user'})
+        if not profile:
+            return {'error': 'No profile found. Please upload a resume first.'}
+
+        parsed_profile = profile.get('parsed_profile')
+        if parsed_profile:
+            return {
+                'success': True,
+                'parsed_profile': parsed_profile,
+            }
+
+        resume_text = profile.get('resume_text')
+        if not resume_text:
+            return {'error': 'No resume found. Please upload a resume first.'}
+
+        parser_agent = ResumeProfileAgent()
+        parsed_profile = parser_agent.parse_resume_text(resume_text)
+
+        collection.update_one(
+            {'_id': 'default_user'},
+            {
+                '$set': {
+                    'parsed_profile': parsed_profile,
+                    'updated_at': datetime.utcnow(),
+                }
+            }
+        )
+        return {
+            'success': True,
+            'parsed_profile': parsed_profile,
+        }
     
     @staticmethod
     def clear_profile():

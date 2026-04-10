@@ -2,6 +2,7 @@ from __future__ import annotations
 from agent.state import AgentState
 from agent.graph import build_graph
 from models.user import UserProfile
+from config import get_llm_config, validate_llm_config, ai_required_features
 
 
 class Orchestrator:
@@ -30,6 +31,16 @@ class Orchestrator:
         print(f"[AutoApply] Target role     : {user.target_role}")
         print(f"[AutoApply] Platforms       : {user.platforms}")
         print(f"[AutoApply] Match threshold : {user.match_threshold}%\n")
+
+        llm_cfg = get_llm_config()
+        llm_ok, llm_msg = validate_llm_config()
+        print(f"[AutoApply] LLM provider    : {llm_cfg.provider}")
+        print(f"[AutoApply] LLM enabled     : {llm_cfg.enabled}")
+        print(f"[AutoApply] LLM config      : {llm_msg}")
+        print("[AutoApply] AI-required features:")
+        for feature, description in ai_required_features().items():
+            print(f"  - {feature}: {description}")
+        print()
 
         final_state = self.graph.invoke(initial_state)
 

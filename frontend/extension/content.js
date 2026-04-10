@@ -60,11 +60,60 @@ function extractFromResume(resume) {
   };
 }
 
+function getCandidateProfile() {
+  const fallback = extractFromResume(currentApplication.resume || '');
+  const parsed = currentApplication.parsed_profile || {};
+
+  return {
+    name: parsed.full_name || parsed.name || fallback.name || '',
+    firstName: parsed.first_name || '',
+    lastName: parsed.last_name || '',
+    email: parsed.email || fallback.email || '',
+    phone: parsed.phone || fallback.phone || '',
+    linkedin: parsed.linkedin || '',
+    github: parsed.github || '',
+    portfolio: parsed.portfolio || '',
+    location: parsed.location || '',
+    summary: parsed.summary || '',
+    currentTitle: parsed.current_title || '',
+    skills: Array.isArray(parsed.skills) ? parsed.skills : [],
+  };
+}
+
+function fillTextInput(input, value) {
+  if (!input || !value || input.value) return false;
+  input.value = value;
+  input.dispatchEvent(new Event('input', { bubbles: true }));
+  input.dispatchEvent(new Event('change', { bubbles: true }));
+  return true;
+}
+
+function fillByKeyword(keywords, value) {
+  if (!value) return 0;
+  let count = 0;
+  const elements = document.querySelectorAll('input, textarea');
+
+  elements.forEach((el) => {
+    const text = [
+      el.getAttribute('name') || '',
+      el.getAttribute('id') || '',
+      el.getAttribute('placeholder') || '',
+      el.getAttribute('aria-label') || '',
+    ].join(' ').toLowerCase();
+
+    if (keywords.some((k) => text.includes(k.toLowerCase()))) {
+      if (fillTextInput(el, value)) count++;
+    }
+  });
+
+  return count;
+}
+
 /**
  * LinkedIn Autofill
  */
 function autofillLinkedIn() {
-  const userInfo = extractFromResume(currentApplication.resume);
+  const userInfo = getCandidateProfile();
   console.log('[LinkedIn] Starting autofill with position:', currentApplication.position);
 
   let fieldsFound = 0;
@@ -88,10 +137,7 @@ function autofillLinkedIn() {
     'input[name*="name" i], input[aria-label*="first name" i], input[placeholder*="name" i]'
   );
   nameInputs.forEach((input) => {
-    if (!input.value && userInfo.name) {
-      input.value = userInfo.name;
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-      input.dispatchEvent(new Event('change', { bubbles: true }));
+    if (fillTextInput(input, userInfo.name)) {
       fieldsFound++;
       console.log('[LinkedIn] ✓ Filled name');
     }
@@ -102,10 +148,7 @@ function autofillLinkedIn() {
     'input[type="email"], input[name*="email" i], input[aria-label*="email" i]'
   );
   emailInputs.forEach((input) => {
-    if (!input.value && userInfo.email) {
-      input.value = userInfo.email;
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-      input.dispatchEvent(new Event('change', { bubbles: true }));
+    if (fillTextInput(input, userInfo.email)) {
       fieldsFound++;
       console.log('[LinkedIn] ✓ Filled email');
     }
@@ -116,14 +159,16 @@ function autofillLinkedIn() {
     'input[type="tel"], input[name*="phone" i], input[aria-label*="phone" i]'
   );
   phoneInputs.forEach((input) => {
-    if (!input.value && userInfo.phone) {
-      input.value = userInfo.phone;
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-      input.dispatchEvent(new Event('change', { bubbles: true }));
+    if (fillTextInput(input, userInfo.phone)) {
       fieldsFound++;
       console.log('[LinkedIn] ✓ Filled phone');
     }
   });
+
+  fieldsFound += fillByKeyword(['linkedin'], userInfo.linkedin);
+  fieldsFound += fillByKeyword(['github'], userInfo.github);
+  fieldsFound += fillByKeyword(['portfolio', 'website', 'personal site'], userInfo.portfolio);
+  fieldsFound += fillByKeyword(['location', 'city'], userInfo.location);
 
   console.log('[LinkedIn] Autofill complete. Fields filled:', fieldsFound);
 }
@@ -132,7 +177,7 @@ function autofillLinkedIn() {
  * Indeed Autofill
  */
 function autofillIndeed() {
-  const userInfo = extractFromResume(currentApplication.resume);
+  const userInfo = getCandidateProfile();
   console.log('[Indeed] Starting autofill with position:', currentApplication.position);
 
   let fieldsFound = 0;
@@ -178,7 +223,7 @@ function autofillIndeed() {
  * Wellfound Autofill
  */
 function autofillWellfound() {
-  const userInfo = extractFromResume(currentApplication.resume);
+  const userInfo = getCandidateProfile();
   console.log('[Wellfound] Starting autofill');
 
   let fieldsFound = 0;
@@ -213,7 +258,7 @@ function autofillWellfound() {
  * Intershala Autofill
  */
 function autofillIntershala() {
-  const userInfo = extractFromResume(currentApplication.resume);
+  const userInfo = getCandidateProfile();
   console.log('[Intershala] Starting autofill');
 
   let fieldsFound = 0;
@@ -259,7 +304,7 @@ function autofillIntershala() {
  * Naukri Autofill
  */
 function autofillNaukri() {
-  const userInfo = extractFromResume(currentApplication.resume);
+  const userInfo = getCandidateProfile();
   console.log('[Naukri] Starting autofill');
 
   let fieldsFound = 0;

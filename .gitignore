@@ -9,8 +9,20 @@ next.user-config.*
 
 # Environment variables
 .env*.local
+.env
+Backend/.env
+
+# Sensitive backend credentials
+Backend/policyagent-*.json
+Backend/*service-account*.json
+Backend/*.pem
+Backend/*.key
 
 # Common ignores
 node_modules
 .next/
 .DS_Store
+
+# Python cache
+__pycache__/
+*.pyc

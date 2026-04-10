@@ -82,6 +82,33 @@ def update_resume():
         return jsonify({'error': str(e)}), 500
 
 
+@profile_bp.route('/resume/upload', methods=['POST'])
+def upload_resume_file():
+    """Upload resume file and parse structured profile fields."""
+    print('[Profile] POST /api/profile/resume/upload request received')
+
+    try:
+        if 'resume' not in request.files:
+            return jsonify({'error': 'Missing resume file'}), 400
+
+        resume_file = request.files['resume']
+        if not resume_file or not resume_file.filename:
+            return jsonify({'error': 'Invalid resume file'}), 400
+
+        file_bytes = resume_file.read()
+        result = UserProfileController.upload_resume_file(file_bytes, resume_file.filename)
+
+        if 'error' in result:
+            print(f'[Profile] ERROR from controller: {result}')
+            return jsonify(result), 400
+
+        return jsonify(result), 200
+    except Exception as e:
+        print(f'[Profile] EXCEPTION in upload_resume_file: {type(e).__name__}: {e}')
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+
 @profile_bp.route('/clear', methods=['POST'])
 def clear_profile():
     """Clear user profile data"""
@@ -98,5 +125,22 @@ def clear_profile():
         return jsonify(result), 200
     except Exception as e:
         print(f'[Profile] EXCEPTION in clear_profile: {type(e).__name__}: {e}')
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+
+@profile_bp.route('/parsed', methods=['GET'])
+def get_parsed_profile():
+    """Get parsed resume profile fields for extension autofill."""
+    print('[Profile] GET /api/profile/parsed request received')
+    try:
+        result = UserProfileController.get_parsed_resume_profile()
+        if 'error' in result:
+            print(f'[Profile] ERROR from controller: {result}')
+            return jsonify(result), 400
+
+        return jsonify(result), 200
+    except Exception as e:
+        print(f'[Profile] EXCEPTION in get_parsed_profile: {type(e).__name__}: {e}')
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500

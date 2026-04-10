@@ -42,6 +42,33 @@ window.addEventListener('message', (event) => {
       console.error('[WebBridge] Failed to send message to extension:', error);
     }
   }
+
+  if (type === 'SYNC_PARSED_PROFILE') {
+    console.log('[WebBridge] Received parsed profile sync request');
+
+    if (!window.chrome || !window.chrome.runtime) {
+      console.error('[WebBridge] Chrome extension API not available - extension may not be installed');
+      return;
+    }
+
+    try {
+      chrome.runtime.sendMessage(
+        {
+          type: 'SYNC_PARSED_PROFILE',
+          payload: payload,
+        },
+        (response) => {
+          if (chrome.runtime.lastError) {
+            console.error('[WebBridge] Extension error (profile sync):', chrome.runtime.lastError);
+            return;
+          }
+          console.log('[WebBridge] Parsed profile synced to extension:', response);
+        }
+      );
+    } catch (error) {
+      console.error('[WebBridge] Failed to sync parsed profile to extension:', error);
+    }
+  }
 });
 
 // Notify web app that extension is ready
