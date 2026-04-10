@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 400px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+      color: white;
+    }
+
+    .header h1 {
+      font-size: 20px;
+      margin-bottom: 5px;
+    }
+
+    .header p {
+      font-size: 12px;
+      opacity: 0.9;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      background: #f0f9ff;
+      border-left: 4px solid #3b82f6;
+      border-radius: 6px;
+      margin-bottom: 15px;
+    }
+
+    .status.connected {
+      background: #f0fdf4;
+      border-left-color: #22c55e;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+    }
+
+    .status.connected .status-dot {
+      background: #22c55e;
+    }
+
+    .status-text {
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .data-preview {
+      font-size: 12px;
+      background: #f9fafb;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    .data-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .data-item:last-child {
+      border-bottom: none;
+    }
+
+    .data-label {
+      font-weight: 600;
+      color: #666;
+    }
+
+    .data-value {
+      color: #333;
+      word-break: break-all;
+      text-align: right;
+      max-width: 200px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    button {
+      flex: 1;
+      padding: 10px 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #333;
+      border: 1px solid #d1d5db;
+    }
+
+    .btn-secondary:hover {
+      background: #e5e7eb;
+    }
+
+    .platforms {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .platform-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px;
+      background: #f3f4f6;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .platform-badge.active {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .info-box {
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      line-height: 1.4;
+      color: #78350f;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 20px;
+      color: #999;
+    }
+
+    .empty-state p {
+      font-size: 12px;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border: 2px solid #f3f4f6;
+      border-top: 2px solid #667eea;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .success {
+      color: #22c55e;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>⚡ AutoApply</h1>
+    <p>Smart Job Application Autofill</p>
+  </div>
+
+  <div class="card">
+    <div id="status" class="status">
+      <div class="status-dot"></div>
+      <div class="status-text">Checking connection...</div>
+    </div>
+
+    <div id="data-container" class="empty-state">
+      <p>No autofill data configured</p>
+      <p style="font-size: 10px; margin-top: 8px;">Configure your profile in the web app</p>
+    </div>
+
+    <div id="platforms-container"></div>
+
+    <div class="buttons">
+      <button class="btn-primary" id="open-settings">Configure Profile</button>
+      <button class="btn-secondary" id="refresh">Refresh</button>
+    </div>
+
+    <div class="info-box">
+      💡 Open a job listing on LinkedIn, Internshala, or Wellfound to autofill your application.
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

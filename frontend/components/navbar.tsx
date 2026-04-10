@@ -14,6 +14,7 @@ export function Navbar() {
     { href: '/', label: 'Home' },
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/setup', label: 'Setup' },
+    { href: '/autofill', label: 'Autofill' },
     { href: '/analytics', label: 'Analytics' },
     { href: '/applications', label: 'Applications' },
     { href: '/settings', label: 'Settings' },
